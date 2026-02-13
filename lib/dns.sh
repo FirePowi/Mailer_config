@@ -234,23 +234,23 @@ DNSEOF
 interactive_dns_setup() {
     print_section "Interactive DNS Setup Assistant"
     
-    cat << EOF
-
-${BOLD}${CYAN}Welcome to the DNS Setup Assistant!${NC}
-
-We'll walk you through setting up DNS records step-by-step.
-This will only take a few minutes.
-
-${GREEN}What you'll need:${NC}
-• Access to your domain's DNS settings
-• Your domain registrar login (GoDaddy, Namecheap, etc.)
-  OR Cloudflare account if you use their DNS
-
-${YELLOW}Don't worry if you're not sure - we'll guide you!${NC}
-
-EOF
-
-    if ! ask_yes_no "Ready to start DNS setup?" "y"; then
+    echo ""
+    printf "${BOLD}${CYAN}Welcome to the DNS Setup Assistant!${NC}\n\n"
+    echo "We'll walk you through setting up DNS records step-by-step."
+    echo "This will only take a few minutes."
+    echo ""
+    printf "${GREEN}What you'll need:${NC}\n"
+    echo "• Access to your domain's DNS settings"
+    echo "• Your domain registrar login (GoDaddy, Namecheap, etc.)"
+    echo "  OR Cloudflare account if you use their DNS"
+    echo ""
+    printf "${YELLOW}Don't worry if you're not sure - we'll guide you!${NC}\n"
+    echo ""
+    
+    echo -ne "${YELLOW}Ready to start DNS setup? [Y/n]: ${NC}"
+    read -r dns_ready || true
+    dns_ready="${dns_ready:-y}"
+    if [[ ! "$dns_ready" =~ ^[Yy]$ ]]; then
         log_warning "Skipping DNS setup for now"
         return 0
     fi
