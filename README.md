@@ -48,14 +48,14 @@ Everything is documented in detail:
 Automated test suite validates your entire configuration:
 
 ```bash
-sudo ./test-server.sh
+sudo ./scripts/test-server.sh
 
 # Or test specific components:
-sudo ./test-server.sh --services  # Test Postfix, Dovecot, MySQL
-sudo ./test-server.sh --network   # Test ports and connectivity
-sudo ./test-server.sh --ssl       # Validate SSL certificates
-sudo ./test-server.sh --dns       # Check DNS records
-sudo ./test-server.sh --mail      # Test mail flow
+sudo ./scripts/test-server.sh --services  # Test Postfix, Dovecot, MySQL
+sudo ./scripts/test-server.sh --network   # Test ports and connectivity
+sudo ./scripts/test-server.sh --ssl       # Validate SSL certificates
+sudo ./scripts/test-server.sh --dns       # Check DNS records
+sudo ./scripts/test-server.sh --mail      # Test mail flow
 ```
 
 See [Documentation/TESTING.md](Documentation/TESTING.md) for details.
@@ -104,8 +104,12 @@ lib/
 ├── dns.sh             # DNS configuration helper (5 providers)
 ├── input.sh           # User input collection
 └── config.sh          # Configuration variables
-test-server.sh          # Automated testing suite
-Documentation/          # Detailed guides
+scripts/
+├── test-server.sh          # Automated testing suite
+├── check-ssl-ciphers.sh    # SSL security audit
+├── update-ssl-config.sh    # SSL configuration updater
+└── [other utilities]       # Additional helper scripts
+Documentation/              # Detailed guides
 ```
 
 ## 🤝 Contributing

@@ -37,7 +37,7 @@ This script automatically tests your mail server configuration and connectivity.
 ## Usage
 
 ```bash
-sudo ./test-server.sh
+sudo ./scripts/test-server.sh
 ```
 
 ## Interactive Mode
@@ -52,20 +52,20 @@ The script will:
 
 ```bash
 # Test specific components
-sudo ./test-server.sh --services    # Only test services
-sudo ./test-server.sh --network     # Only test network
-sudo ./test-server.sh --ssl         # Only test SSL/TLS
-sudo ./test-server.sh --dns         # Only test DNS
-sudo ./test-server.sh --mail        # Only test mail flow
+sudo ./scripts/test-server.sh --services    # Only test services
+sudo ./scripts/test-server.sh --network     # Only test network
+sudo ./scripts/test-server.sh --ssl         # Only test SSL/TLS
+sudo ./scripts/test-server.sh --dns         # Only test DNS
+sudo ./scripts/test-server.sh --mail        # Only test mail flow
 
 # Verbose output
-sudo ./test-server.sh --verbose     # Show detailed output
+sudo ./scripts/test-server.sh --verbose     # Show detailed output
 
 # Non-interactive mode
-sudo ./test-server.sh --quiet       # Minimal output, exit code only
+sudo ./scripts/test-server.sh --quiet       # Minimal output, exit code only
 
 # Generate report
-sudo ./test-server.sh --report report.txt  # Save results to file
+sudo ./scripts/test-server.sh --report report.txt  # Save results to file
 ```
 
 ## Exit Codes

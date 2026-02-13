@@ -31,7 +31,7 @@ DHE-RSA-AES256-GCM-SHA384
 Check your SSL/TLS configuration:
 
 ```bash
-sudo ./check-ssl-ciphers.sh
+sudo ./scripts/check-ssl-ciphers.sh
 ```
 
 This checks:
@@ -46,7 +46,7 @@ This checks:
 To update all services to the latest security standards:
 
 ```bash
-sudo ./update-ssl-config.sh
+sudo ./scripts/update-ssl-config.sh
 ```
 
 This script:
@@ -484,10 +484,10 @@ yum update                         # RHEL/CentOS
 
 ```bash
 # Test SSL certificates
-./check-ssl-ciphers.sh
+./scripts/check-ssl-ciphers.sh
 
 # Test mail server
-./test-server.sh
+./scripts/test-server.sh
 
 # Review fail2ban blocks
 fail2ban-client status
