@@ -36,6 +36,10 @@ DOVECOT_DIR="/etc/dovecot"
 VMAIL_DIR="/var/vmail"
 CERTBOT_DIR="/etc/letsencrypt"
 
-# Script directory (set by main installer)
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LIB_DIR="${SCRIPT_DIR}/lib"
+# Script directories (set by main installer, do not override if already set)
+if [ -z "${SCRIPT_DIR:-}" ]; then
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+fi
+if [ -z "${LIB_DIR:-}" ]; then
+    LIB_DIR="${SCRIPT_DIR}/lib"
+fi
