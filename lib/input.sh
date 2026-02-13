@@ -7,11 +7,13 @@
 collect_basic_info() {
     print_section "Basic Configuration"
     
-    echo -e "${WHITE}Let's configure your mail server. I'll ask you a few questions.${NC}\n"
+    echo -e "${WHITE}Let's configure your mail server. I'll ask you a few questions.${NC}"
+    echo ""
     
     # Primary domain
     while true; do
-        PRIMARY_DOMAIN=$(ask_question "Enter your primary mail domain (e.g., example.com):")
+        echo -ne "${YELLOW}Enter your primary mail domain (e.g., example.com): ${NC}"
+        read -r PRIMARY_DOMAIN || true
         # Trim whitespace
         PRIMARY_DOMAIN=$(echo "$PRIMARY_DOMAIN" | xargs)
         # Validate: alphanumeric with dots and hyphens, at least one dot, TLD with 2+ chars
@@ -25,17 +27,23 @@ collect_basic_info() {
     done
     
     # Hostname
-    HOSTNAME=$(ask_question "Enter the mail server hostname:" "mail.$PRIMARY_DOMAIN")
+    echo -ne "${YELLOW}Enter the mail server hostname [mail.$PRIMARY_DOMAIN]: ${NC}"
+    read -r hostname_input || true
+    HOSTNAME="${hostname_input:-mail.$PRIMARY_DOMAIN}"
     
     # Admin email
-    ADMIN_EMAIL=$(ask_question "Enter admin email address:" "admin@$PRIMARY_DOMAIN")
+    echo -ne "${YELLOW}Enter admin email address [admin@$PRIMARY_DOMAIN]: ${NC}"
+    read -r email_input || true
+    ADMIN_EMAIL="${email_input:-admin@$PRIMARY_DOMAIN}"
     
     # Additional domains
     echo ""
-    if ask_yes_no "Do you want to add additional domains?" "n"; then
+    echo -ne "${YELLOW}Do you want to add additional domains? [y/N]: ${NC}"
+    read -r add_domains || true
+    if [[ "$add_domains" =~ ^[Yy]$ ]]; then
         while true; do
-            local domain
-            domain=$(ask_question "Enter additional domain (or press Enter to finish):")
+            echo -ne "${YELLOW}Enter additional domain (or press Enter to finish): ${NC}"
+            read -r domain || true
             # Trim whitespace
             domain=$(echo "$domain" | xargs)
             if [[ -z "$domain" ]]; then
