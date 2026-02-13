@@ -288,159 +288,138 @@ interactive_dns_setup() {
 }
 
 show_cloudflare_guide() {
-    cat << EOF
-
-${BOLD}${CYAN}Cloudflare DNS Setup:${NC}
-
-${YELLOW}1.${NC} Go to: https://dash.cloudflare.com/
-${YELLOW}2.${NC} Select your domain: ${WHITE}$PRIMARY_DOMAIN${NC}
-${YELLOW}3.${NC} Click "DNS" in the top menu
-${YELLOW}4.${NC} Click "Add record" button
-
-${BOLD}Add these 3 A records:${NC}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Type: A    | Name: mail          | IPv4: $SERVER_IP | Proxy: OFF
-Type: A    | Name: autoconfig    | IPv4: $SERVER_IP | Proxy: OFF  
-Type: A    | Name: autodiscover  | IPv4: $SERVER_IP | Proxy: OFF
-
-${YELLOW}IMPORTANT:${NC} Turn ${BOLD}OFF${NC} the orange cloud (proxy) for mail records!
-
-${BOLD}Add MX record:${NC}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Type: MX   | Name: @             | Server: $HOSTNAME | Priority: 10
-
-${BOLD}Add TXT records:${NC}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Type: TXT  | Name: @             | Content: v=spf1 mx a ~all
-Type: TXT  | Name: _dmarc        | Content: v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL
-
-${GREEN}✓ Done!${NC} Cloudflare DNS updates usually take 2-5 minutes.
-
-EOF
+    echo ""
+    printf "${BOLD}${CYAN}Cloudflare DNS Setup:${NC}\n\n"
+    printf "${YELLOW}1.${NC} Go to: https://dash.cloudflare.com/\n"
+    printf "${YELLOW}2.${NC} Select your domain: ${WHITE}$PRIMARY_DOMAIN${NC}\n"
+    printf "${YELLOW}3.${NC} Click \"DNS\" in the top menu\n"
+    printf "${YELLOW}4.${NC} Click \"Add record\" button\n\n"
+    printf "${BOLD}Add these 3 A records:${NC}\n"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Type: A    | Name: mail          | IPv4: $SERVER_IP | Proxy: OFF"
+    echo "Type: A    | Name: autoconfig    | IPv4: $SERVER_IP | Proxy: OFF"  
+    echo "Type: A    | Name: autodiscover  | IPv4: $SERVER_IP | Proxy: OFF"
+    echo ""
+    printf "${YELLOW}IMPORTANT:${NC} Turn ${BOLD}OFF${NC} the orange cloud (proxy) for mail records!\n\n"
+    printf "${BOLD}Add MX record:${NC}\n"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Type: MX   | Name: @             | Server: $HOSTNAME | Priority: 10"
+    echo ""
+    printf "${BOLD}Add TXT records:${NC}\n"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Type: TXT  | Name: @             | Content: v=spf1 mx a ~all"
+    echo "Type: TXT  | Name: _dmarc        | Content: v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL"
+    echo ""
+    printf "${GREEN}✓ Done!${NC} Cloudflare DNS updates usually take 2-5 minutes.\n"
+    echo ""
     pause_for_user
 }
 
 show_godaddy_guide() {
-    cat << EOF
-
-${BOLD}${CYAN}GoDaddy DNS Setup:${NC}
-
-${YELLOW}1.${NC} Go to: https://dcc.godaddy.com/manage/dns
-${YELLOW}2.${NC} Find domain: ${WHITE}$PRIMARY_DOMAIN${NC} and click "DNS"
-${YELLOW}3.${NC} Scroll to "Records" section
-${YELLOW}4.${NC} Click "Add" for each record below
-
-${BOLD}A Records:${NC}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Type: A    | Name: mail          | Value: $SERVER_IP | TTL: 1 Hour
-Type: A    | Name: autoconfig    | Value: $SERVER_IP | TTL: 1 Hour
-Type: A    | Name: autodiscover  | Value: $SERVER_IP | TTL: 1 Hour
-
-${BOLD}MX Record:${NC}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Type: MX   | Name: @             | Value: $HOSTNAME | Priority: 10 | TTL: 1 Hour
-
-${BOLD}TXT Records:${NC}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Type: TXT  | Name: @             | Value: v=spf1 mx a ~all
-Type: TXT  | Name: _dmarc        | Value: v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL
-
-${GREEN}✓ Done!${NC} GoDaddy DNS updates usually take 10-30 minutes.
-
-EOF
+    echo ""
+    printf "${BOLD}${CYAN}GoDaddy DNS Setup:${NC}\n\n"
+    printf "${YELLOW}1.${NC} Go to: https://dcc.godaddy.com/manage/dns\n"
+    printf "${YELLOW}2.${NC} Find domain: ${WHITE}$PRIMARY_DOMAIN${NC} and click \"DNS\"\n"
+    printf "${YELLOW}3.${NC} Scroll to \"Records\" section\n"
+    printf "${YELLOW}4.${NC} Click \"Add\" for each record below\n\n"
+    printf "${BOLD}A Records:${NC}\n"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Type: A    | Name: mail          | Value: $SERVER_IP | TTL: 1 Hour"
+    echo "Type: A    | Name: autoconfig    | Value: $SERVER_IP | TTL: 1 Hour"
+    echo "Type: A    | Name: autodiscover  | Value: $SERVER_IP | TTL: 1 Hour"
+    echo ""
+    printf "${BOLD}MX Record:${NC}\n"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Type: MX   | Name: @             | Value: $HOSTNAME | Priority: 10 | TTL: 1 Hour"
+    echo ""
+    printf "${BOLD}TXT Records:${NC}\n"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Type: TXT  | Name: @             | Value: v=spf1 mx a ~all"
+    echo "Type: TXT  | Name: _dmarc        | Value: v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL"
+    echo ""
+    printf "${GREEN}✓ Done!${NC} GoDaddy DNS updates usually take 10-30 minutes.\n"
+    echo ""
     pause_for_user
 }
 
 show_namecheap_guide() {
-    cat << EOF
-
-${BOLD}${CYAN}Namecheap DNS Setup:${NC}
-
-${YELLOW}1.${NC} Go to: https://ap.www.namecheap.com/domains/list/
-${YELLOW}2.${NC} Click "Manage" next to: ${WHITE}$PRIMARY_DOMAIN${NC}
-${YELLOW}3.${NC} Click "Advanced DNS" tab
-${YELLOW}4.${NC} Click "Add New Record" for each entry
-
-${BOLD}A Records:${NC}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Type: A Record  | Host: mail          | Value: $SERVER_IP
-Type: A Record  | Host: autoconfig    | Value: $SERVER_IP
-Type: A Record  | Host: autodiscover  | Value: $SERVER_IP
-
-${BOLD}MX Record:${NC}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Type: MX Record | Host: @             | Value: $HOSTNAME | Priority: 10
-
-${BOLD}TXT Records:${NC}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Type: TXT Record | Host: @            | Value: v=spf1 mx a ~all
-Type: TXT Record | Host: _dmarc       | Value: v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL
-
-${GREEN}✓ Done!${NC} Namecheap DNS updates usually take 5-30 minutes.
-
-EOF
+    echo ""
+    printf "${BOLD}${CYAN}Namecheap DNS Setup:${NC}\n\n"
+    printf "${YELLOW}1.${NC} Go to: https://ap.www.namecheap.com/domains/list/\n"
+    printf "${YELLOW}2.${NC} Click \"Manage\" next to: ${WHITE}$PRIMARY_DOMAIN${NC}\n"
+    printf "${YELLOW}3.${NC} Click \"Advanced DNS\" tab\n"
+    printf "${YELLOW}4.${NC} Click \"Add New Record\" for each entry\n\n"
+    printf "${BOLD}A Records:${NC}\n"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Type: A Record  | Host: mail          | Value: $SERVER_IP"
+    echo "Type: A Record  | Host: autoconfig    | Value: $SERVER_IP"
+    echo "Type: A Record  | Host: autodiscover  | Value: $SERVER_IP"
+    echo ""
+    printf "${BOLD}MX Record:${NC}\n"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Type: MX Record | Host: @             | Value: $HOSTNAME | Priority: 10"
+    echo ""
+    printf "${BOLD}TXT Records:${NC}\n"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Type: TXT Record | Host: @            | Value: v=spf1 mx a ~all"
+    echo "Type: TXT Record | Host: _dmarc       | Value: v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL"
+    echo ""
+    printf "${GREEN}✓ Done!${NC} Namecheap DNS updates usually take 5-30 minutes.\n"
+    echo ""
     pause_for_user
 }
 
 show_google_guide() {
-    cat << EOF
-
-${BOLD}${CYAN}Google Domains / Cloud DNS Setup:${NC}
-
-${YELLOW}1.${NC} Go to: https://domains.google.com/ (or cloud.google.com/dns)
-${YELLOW}2.${NC} Click your domain: ${WHITE}$PRIMARY_DOMAIN${NC}
-${YELLOW}3.${NC} Click "DNS" in the left menu
-${YELLOW}4.${NC} Scroll to "Custom records" and click "Manage custom records"
-
-${BOLD}Add these records:${NC}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Host name     | Type | TTL  | Data
-mail          | A    | 3600 | $SERVER_IP
-autoconfig    | A    | 3600 | $SERVER_IP
-autodiscover  | A    | 3600 | $SERVER_IP
-@             | MX   | 3600 | 10 $HOSTNAME
-@             | TXT  | 3600 | v=spf1 mx a ~all
-_dmarc        | TXT  | 3600 | v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL
-
-${GREEN}✓ Done!${NC} Google DNS updates usually take 5-15 minutes.
-
-EOF
+    echo ""
+    printf "${BOLD}${CYAN}Google Domains / Cloud DNS Setup:${NC}\n\n"
+    printf "${YELLOW}1.${NC} Go to: https://domains.google.com/ (or cloud.google.com/dns)\n"
+    printf "${YELLOW}2.${NC} Click your domain: ${WHITE}$PRIMARY_DOMAIN${NC}\n"
+    printf "${YELLOW}3.${NC} Click \"DNS\" in the left menu\n"
+    printf "${YELLOW}4.${NC} Scroll to \"Custom records\" and click \"Manage custom records\"\n\n"
+    printf "${BOLD}Add these records:${NC}\n"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Host name     | Type | TTL  | Data"
+    echo "mail          | A    | 3600 | $SERVER_IP"
+    echo "autoconfig    | A    | 3600 | $SERVER_IP"
+    echo "autodiscover  | A    | 3600 | $SERVER_IP"
+    echo "@             | MX   | 3600 | 10 $HOSTNAME"
+    echo "@             | TXT  | 3600 | v=spf1 mx a ~all"
+    echo "_dmarc        | TXT  | 3600 | v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL"
+    echo ""
+    printf "${GREEN}✓ Done!${NC} Google DNS updates usually take 5-15 minutes.\n"
+    echo ""
     pause_for_user
 }
 
 show_generic_guide() {
-    cat << EOF
-
-${BOLD}${CYAN}Generic DNS Setup Guide:${NC}
-
-Look for these sections in your DNS control panel:
-• "DNS Management"
-• "DNS Settings"  
-• "Zone File Editor"
-• "Manage DNS Records"
-
-${BOLD}You need to add these records:${NC}
-
-${YELLOW}A Records (3 entries):${NC}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Name/Host          | Type | Value/Points To
-mail               | A    | $SERVER_IP
-autoconfig         | A    | $SERVER_IP
-autodiscover       | A    | $SERVER_IP
-
-${YELLOW}MX Record (1 entry):${NC}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Name/Host          | Type | Value/Points To      | Priority
-@  (or blank)      | MX   | $HOSTNAME           | 10
-
-${YELLOW}TXT Records (2 entries):${NC}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Name/Host          | Type | Value/Content
-@  (or blank)      | TXT  | v=spf1 mx a ~all
-_dmarc             | TXT  | v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL
-
-${GREEN}✓ Save each record after adding it!${NC}
-
-EOF
+    echo ""
+    printf "${BOLD}${CYAN}Generic DNS Setup Guide:${NC}\n\n"
+    echo "Look for these sections in your DNS control panel:"
+    echo "• \"DNS Management\""
+    echo "• \"DNS Settings\""  
+    echo "• \"Zone File Editor\""
+    echo "• \"Manage DNS Records\""
+    echo ""
+    printf "${BOLD}You need to add these records:${NC}\n\n"
+    printf "${YELLOW}A Records (3 entries):${NC}\n"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Name/Host          | Type | Value/Points To"
+    echo "mail               | A    | $SERVER_IP"
+    echo "autoconfig         | A    | $SERVER_IP"
+    echo "autodiscover       | A    | $SERVER_IP"
+    echo ""
+    printf "${YELLOW}MX Record (1 entry):${NC}\n"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Name/Host          | Type | Value/Points To      | Priority"
+    echo "@  (or blank)      | MX   | $HOSTNAME           | 10"
+    echo ""
+    printf "${YELLOW}TXT Records (2 entries):${NC}\n"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "Name/Host          | Type | Value/Content"
+    echo "@  (or blank)      | TXT  | v=spf1 mx a ~all"
+    echo "_dmarc             | TXT  | v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL"
+    echo ""
+    printf "${GREEN}✓ Save each record after adding it!${NC}\n"
+    echo ""
     pause_for_user
 }
