@@ -4,6 +4,10 @@
 # Guides users through DNS setup step-by-step
 #
 
+# Source UI library for colors and formatting
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/ui.sh"
+
 get_server_ip() {
     # Try multiple methods to get public IP
     ip=$(curl -s ifconfig.me 2>/dev/null || curl -s icanhazip.com 2>/dev/null || curl -s ipinfo.io/ip 2>/dev/null)
