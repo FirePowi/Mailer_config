@@ -90,25 +90,37 @@ collect_component_choices() {
     ENABLE_POLICYD_SPF=true
     
     # SpamAssassin
-    if ask_yes_no "Install SpamAssassin? (spam filtering)" "y"; then
+    echo -ne "${YELLOW}Install SpamAssassin? (spam filtering) [Y/n]: ${NC}"
+    read -r spamassassin_choice || true
+    spamassassin_choice="${spamassassin_choice:-y}"
+    if [[ "$spamassassin_choice" =~ ^[Yy]$ ]]; then
         ENABLE_SPAMASSASSIN=true
     fi
     
     # ClamAV
-    if ask_yes_no "Install ClamAV? (antivirus scanning)" "n"; then
+    echo -ne "${YELLOW}Install ClamAV? (antivirus scanning) [y/N]: ${NC}"
+    read -r clamav_choice || true
+    clamav_choice="${clamav_choice:-n}"
+    if [[ "$clamav_choice" =~ ^[Yy]$ ]]; then
         ENABLE_CLAMAV=true
     fi
     
     # Rspamd (alternative to SpamAssassin)
     if ! $ENABLE_SPAMASSASSIN; then
-        if ask_yes_no "Install Rspamd? (modern spam filtering alternative)" "n"; then
+        echo -ne "${YELLOW}Install Rspamd? (modern spam filtering alternative) [y/N]: ${NC}"
+        read -r rspamd_choice || true
+        rspamd_choice="${rspamd_choice:-n}"
+        if [[ "$rspamd_choice" =~ ^[Yy]$ ]]; then
             ENABLE_RSPAMD=true
         fi
     fi
     
     # OpenDKIM
     echo ""
-    if ask_yes_no "Install OpenDKIM? (email authentication)" "y"; then
+    echo -ne "${YELLOW}Install OpenDKIM? (email authentication) [Y/n]: ${NC}"
+    read -r dkim_choice || true
+    dkim_choice="${dkim_choice:-y}"
+    if [[ "$dkim_choice" =~ ^[Yy]$ ]]; then
         ENABLE_DKIM=true
     fi
     
@@ -170,8 +182,10 @@ collect_component_choices() {
     
     local webmail_selection
     while true; do
-        webmail_selection=$(ask_question "Select webmail client [1-$option_num]:" "1")
-        if [[ "$webmail_selection" -ge 1 && "$webmail_selection" -le "$option_num" ]]; then
+        echo -ne "${YELLOW}Select webmail client [1-$option_num] [1]: ${NC}"
+        read -r webmail_selection || true
+        webmail_selection="${webmail_selection:-1}"
+        if [[ "$webmail_selection" =~ ^[0-9]+$ ]] && [[ "$webmail_selection" -ge 1 && "$webmail_selection" -le "$option_num" ]]; then
             WEBMAIL_CHOICE="${available_options[$((webmail_selection-1))]}"
             if [ "$WEBMAIL_CHOICE" = "none" ]; then
                 log_info "Skipping webmail installation"
