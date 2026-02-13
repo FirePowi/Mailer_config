@@ -79,73 +79,75 @@ test_dns_records() {
 show_dns_configuration() {
     print_section "DNS Configuration Guide"
     
-    cat << EOF
+    echo -e ""
+    echo -e "${BOLD}${YELLOW}IMPORTANT: DNS Setup Required${NC}"
+    echo -e ""
 
-${BOLD}${YELLOW}IMPORTANT: DNS Setup Required${NC}
-
-Your mail server needs specific DNS records to work properly. 
-${GREEN}Don't worry!${NC} We'll guide you through this step-by-step.
-
-${BOLD}${WHITE}Your Server Information:${NC}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${CYAN}Server IP:${NC}      ${WHITE}$SERVER_IP${NC}
-${CYAN}Hostname:${NC}       ${WHITE}$HOSTNAME${NC}
-${CYAN}Primary Domain:${NC} ${WHITE}$PRIMARY_DOMAIN${NC}
-
-${BOLD}${WHITE}Step-by-Step DNS Setup Guide:${NC}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-${YELLOW}Step 1: Log into your DNS provider${NC}
-   Common providers: Cloudflare, Namecheap, GoDaddy, Google Domains, etc.
-   Look for "DNS Management", "DNS Settings", or "Zone File Editor"
-
-${YELLOW}Step 2: Add A Record (required)${NC}
-   ${CYAN}Type:${NC}     A
-   ${CYAN}Name:${NC}     ${WHITE}mail${NC} (or ${WHITE}$HOSTNAME${NC})
-   ${CYAN}Value:${NC}    ${WHITE}$SERVER_IP${NC}
-   ${CYAN}TTL:${NC}      3600 (or automatic)
-   
-   ${GREEN}What this does:${NC} Points mail.$PRIMARY_DOMAIN to your server
-
-${YELLOW}Step 3: Add MX Record (required)${NC}
-   ${CYAN}Type:${NC}     MX
-   ${CYAN}Name:${NC}     ${WHITE}@${NC} (or leave blank for root domain)
-   ${CYAN}Value:${NC}    ${WHITE}$HOSTNAME${NC} (or ${WHITE}mail.$PRIMARY_DOMAIN${NC})
-   ${CYAN}Priority:${NC} ${WHITE}10${NC}
-   ${CYAN}TTL:${NC}      3600
-   
-   ${GREEN}What this does:${NC} Tells other servers where to send email for $PRIMARY_DOMAIN
-
-${YELLOW}Step 4: Add Autodiscover Records (recommended)${NC}
-   ${CYAN}Record 1:${NC}
-   Type:     A
-   Name:     ${WHITE}autoconfig${NC}
-   Value:    ${WHITE}$SERVER_IP${NC}
-   
-   ${CYAN}Record 2:${NC}
-   Type:     A
-   Name:     ${WHITE}autodiscover${NC}
-   Value:    ${WHITE}$SERVER_IP${NC}
-   
-   ${GREEN}What this does:${NC} Enables automatic email client configuration
-
-${YELLOW}Step 5: Add SPF Record (recommended)${NC}
-   ${CYAN}Type:${NC}     TXT
-   ${CYAN}Name:${NC}     ${WHITE}@${NC} (root domain)
-   ${CYAN}Value:${NC}    ${WHITE}"v=spf1 mx a ~all"${NC}
-   
-   ${GREEN}What this does:${NC} Prevents email spoofing, improves deliverability
-
-${YELLOW}Step 6: Add DMARC Record (recommended)${NC}
-   ${CYAN}Type:${NC}     TXT
-   ${CYAN}Name:${NC}     ${WHITE}_dmarc${NC}
-   ${CYAN}Value:${NC}    ${WHITE}"v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL"${NC}
-   
-   ${GREEN}What this does:${NC} Email authentication policy and reporting
-
-${BOLD}${WHITE}Additional Domains Configuration:${NC}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-EOF
+    echo -e ""
+    echo -e "${BOLD}${YELLOW}IMPORTANT: DNS Setup Required${NC}"
+    echo -e ""
+    echo -e "Your mail server needs specific DNS records to work properly."
+    echo -e "${GREEN}Don't worry!${NC} We'll guide you through this step-by-step."
+    echo -e ""
+    echo -e "${BOLD}${WHITE}Your Server Information:${NC}"
+    echo -e "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo -e "${CYAN}Server IP:${NC}      ${WHITE}$SERVER_IP${NC}"
+    echo -e "${CYAN}Hostname:${NC}       ${WHITE}$HOSTNAME${NC}"
+    echo -e "${CYAN}Primary Domain:${NC} ${WHITE}$PRIMARY_DOMAIN${NC}"
+    echo -e ""
+    echo -e "${BOLD}${WHITE}Step-by-Step DNS Setup Guide:${NC}"
+    echo -e "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo -e ""
+    echo -e "${YELLOW}Step 1: Log into your DNS provider${NC}"
+    echo -e "   Common providers: Cloudflare, Namecheap, GoDaddy, Google Domains, etc."
+    echo -e "   Look for \"DNS Management\", \"DNS Settings\", or \"Zone File Editor\""
+    echo -e ""
+    echo -e "${YELLOW}Step 2: Add A Record (required)${NC}"
+    echo -e "   ${CYAN}Type:${NC}     A"
+    echo -e "   ${CYAN}Name:${NC}     ${WHITE}mail${NC} (or ${WHITE}$HOSTNAME${NC})"
+    echo -e "   ${CYAN}Value:${NC}    ${WHITE}$SERVER_IP${NC}"
+    echo -e "   ${CYAN}TTL:${NC}      3600 (or automatic)"
+    echo -e ""
+    echo -e "   ${GREEN}What this does:${NC} Points mail.$PRIMARY_DOMAIN to your server"
+    echo -e ""
+    echo -e "${YELLOW}Step 3: Add MX Record (required)${NC}"
+    echo -e "   ${CYAN}Type:${NC}     MX"
+    echo -e "   ${CYAN}Name:${NC}     ${WHITE}@${NC} (or leave blank for root domain)"
+    echo -e "   ${CYAN}Value:${NC}    ${WHITE}$HOSTNAME${NC} (or ${WHITE}mail.$PRIMARY_DOMAIN${NC})"
+    echo -e "   ${CYAN}Priority:${NC} ${WHITE}10${NC}"
+    echo -e "   ${CYAN}TTL:${NC}      3600"
+    echo -e ""
+    echo -e "   ${GREEN}What this does:${NC} Tells other servers where to send email for $PRIMARY_DOMAIN"
+    echo -e ""
+    echo -e "${YELLOW}Step 4: Add Autodiscover Records (recommended)${NC}"
+    echo -e "   ${CYAN}Record 1:${NC}"
+    echo -e "   Type:     A"
+    echo -e "   Name:     ${WHITE}autoconfig${NC}"
+    echo -e "   Value:    ${WHITE}$SERVER_IP${NC}"
+    echo -e ""
+    echo -e "   ${CYAN}Record 2:${NC}"
+    echo -e "   Type:     A"
+    echo -e "   Name:     ${WHITE}autodiscover${NC}"
+    echo -e "   Value:    ${WHITE}$SERVER_IP${NC}"
+    echo -e ""
+    echo -e "   ${GREEN}What this does:${NC} Enables automatic email client configuration"
+    echo -e ""
+    echo -e "${YELLOW}Step 5: Add SPF Record (recommended)${NC}"
+    echo -e "   ${CYAN}Type:${NC}     TXT"
+    echo -e "   ${CYAN}Name:${NC}     ${WHITE}@${NC} (root domain)"
+    echo -e "   ${CYAN}Value:${NC}    ${WHITE}\"v=spf1 mx a ~all\"${NC}"
+    echo -e ""
+    echo -e "   ${GREEN}What this does:${NC} Prevents email spoofing, improves deliverability"
+    echo -e ""
+    echo -e "${YELLOW}Step 6: Add DMARC Record (recommended)${NC}"
+    echo -e "   ${CYAN}Type:${NC}     TXT"
+    echo -e "   ${CYAN}Name:${NC}     ${WHITE}_dmarc${NC}"
+    echo -e "   ${CYAN}Value:${NC}    ${WHITE}\"v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL\"${NC}"
+    echo -e ""
+    echo -e "   ${GREEN}What this does:${NC} Email authentication policy and reporting"
+    echo -e ""
+    echo -e "${BOLD}${WHITE}Additional Domains Configuration:${NC}"
+    echo -e "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
     if [[ ${#DOMAINS[@]} -gt 1 ]]; then
         echo ""
@@ -157,66 +159,64 @@ EOF
         done
     fi
     
-    cat << EOF
+    echo -e ""
+    echo -e "${BOLD}${WHITE}Reverse DNS (PTR Record):${NC}"
+    echo -e "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo -e ""
+    echo -e "${YELLOW}Important:${NC} Contact your ${BOLD}server/VPS provider${NC} to set this up."
+    echo -e "They control the reverse DNS for $SERVER_IP"
+    echo -e ""
+    echo -e "${CYAN}What to request:${NC}"
+    echo -e "\"Please set the PTR record for $SERVER_IP to point to $HOSTNAME\""
+    echo -e ""
+    echo -e "${GREEN}What this does:${NC} Prevents your emails from being marked as spam"
+    echo -e ""
+    echo -e "${BOLD}${WHITE}How to Check DNS Records:${NC}"
+    echo -e "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo -e ""
+    echo -e "After adding DNS records, verify them with these commands:"
+    echo -e ""
+    echo -e "${CYAN}Check A record:${NC}"
+    echo -e "   dig $HOSTNAME A"
+    echo -e ""
+    echo -e "${CYAN}Check MX record:${NC}"
+    echo -e "   dig $PRIMARY_DOMAIN MX"
+    echo -e ""
+    echo -e "${CYAN}Check SPF record:${NC}"
+    echo -e "   dig $PRIMARY_DOMAIN TXT"
+    echo -e ""
+    echo -e "${CYAN}Check reverse DNS:${NC}"
+    echo -e "   dig -x $SERVER_IP"
+    echo -e ""
+    echo -e "${GREEN}Or use online tools:${NC}"
+    echo -e "   • https://mxtoolbox.com/"
+    echo -e "   • https://www.whatsmydns.net/"
+    echo -e ""
+    echo -e "${BOLD}${YELLOW}⏰ DNS Propagation Time:${NC}"
+    echo -e "DNS changes can take 15 minutes to 48 hours to propagate worldwide."
+    echo -e "You can continue with the installation - the server will be ready when DNS propagates."
+    echo -e ""
+    echo -e "${BOLD}${WHITE}Quick Copy-Paste Records (for your DNS provider):${NC}"
+    echo -e "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-${BOLD}${WHITE}Reverse DNS (PTR Record):${NC}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-${YELLOW}Important:${NC} Contact your ${BOLD}server/VPS provider${NC} to set this up.
-They control the reverse DNS for $SERVER_IP
-
-${CYAN}What to request:${NC}
-"Please set the PTR record for $SERVER_IP to point to $HOSTNAME"
-
-${GREEN}What this does:${NC} Prevents your emails from being marked as spam
-
-${BOLD}${WHITE}How to Check DNS Records:${NC}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-After adding DNS records, verify them with these commands:
-
-${CYAN}Check A record:${NC}
-   dig $HOSTNAME A
-
-${CYAN}Check MX record:${NC}
-   dig $PRIMARY_DOMAIN MX
-
-${CYAN}Check SPF record:${NC}
-   dig $PRIMARY_DOMAIN TXT
-
-${CYAN}Check reverse DNS:${NC}
-   dig -x $SERVER_IP
-
-${GREEN}Or use online tools:${NC}
-   • https://mxtoolbox.com/
-   • https://www.whatsmydns.net/
-
-${BOLD}${YELLOW}⏰ DNS Propagation Time:${NC}
-DNS changes can take 15 minutes to 48 hours to propagate worldwide.
-You can continue with the installation - the server will be ready when DNS propagates.
-
-${BOLD}${WHITE}Quick Copy-Paste Records (for your DNS provider):${NC}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-EOF
-
-    cat << DNSEOF
-
-# A Records
-mail                A       $SERVER_IP
-autoconfig          A       $SERVER_IP
-autodiscover        A       $SERVER_IP
-
-# MX Record
-@                   MX 10   $HOSTNAME.
-
-# TXT Records (SPF and DMARC)
-@                   TXT     "v=spf1 mx a ~all"
-_dmarc              TXT     "v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL"
-
-${CYAN}Note:${NC} The dot after $HOSTNAME is important for the MX record!
-
-DNSEOF
-
+    echo -e ""
+    echo -e "${BOLD}${WHITE}Quick Copy-Paste Records (for your DNS provider):${NC}"
+    echo -e "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo -e ""
+    echo "# A Records"
+    echo "mail                A       $SERVER_IP"
+    echo "autoconfig          A       $SERVER_IP"
+    echo "autodiscover        A       $SERVER_IP"
+    echo ""
+    echo "# MX Record"
+    echo "@                   MX 10   $HOSTNAME."
+    echo ""
+    echo "# TXT Records (SPF and DMARC)"
+    echo "@                   TXT     \"v=spf1 mx a ~all\""
+    echo "_dmarc              TXT     \"v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL\""
+    echo ""
+    echo -e "${CYAN}Note:${NC} The dot after $HOSTNAME is important for the MX record!"
+    echo ""
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
     
