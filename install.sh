@@ -65,14 +65,20 @@ main() {
     
     # Phase 6: Configuration (using old monolithic functions for now)
     # These will be moved to separate modules in the next iteration
-    source "${SCRIPT_DIR}/install-mail-server.sh"
-    
-    setup_database
-    configure_postfix
-    configure_dovecot
-    install_webmail
-    setup_autodiscover
-    setup_ssl_certificates
+    if [ -f "${SCRIPT_DIR}/install-mail-server.sh" ]; then
+        source "${SCRIPT_DIR}/install-mail-server.sh"
+        
+        setup_database
+        configure_postfix
+        configure_dovecot
+        install_webmail
+        setup_autodiscover
+        setup_ssl_certificates
+    else
+        log_error "Configuration functions not yet migrated to modular system"
+        log_info "Please use install-mail-server.sh directly for now"
+        exit 1
+    fi
     start_and_enable_services
     
     # Phase 7: Final Instructions
