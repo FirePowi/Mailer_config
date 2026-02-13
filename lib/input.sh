@@ -12,11 +12,15 @@ collect_basic_info() {
     # Primary domain
     while true; do
         PRIMARY_DOMAIN=$(ask_question "Enter your primary mail domain (e.g., example.com):")
-        if [[ "$PRIMARY_DOMAIN" =~ ^[a-zA-Z0-9][a-zA-Z0-9-]*\.[a-zA-Z]{2,}$ ]]; then
+        # Trim whitespace
+        PRIMARY_DOMAIN=$(echo "$PRIMARY_DOMAIN" | xargs)
+        # Validate: alphanumeric with dots and hyphens, at least one dot, TLD with 2+ chars
+        if [[ "$PRIMARY_DOMAIN" =~ ^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$ ]]; then
             DOMAINS+=("$PRIMARY_DOMAIN")
             break
         else
             log_error "Invalid domain format. Please try again."
+            log_info "Examples: example.com, mail.example.com, my-domain.org"
         fi
     done
     
@@ -32,13 +36,16 @@ collect_basic_info() {
         while true; do
             local domain
             domain=$(ask_question "Enter additional domain (or press Enter to finish):")
+            # Trim whitespace
+            domain=$(echo "$domain" | xargs)
             if [[ -z "$domain" ]]; then
                 break
-            elif [[ "$domain" =~ ^[a-zA-Z0-9][a-zA-Z0-9-]*\.[a-zA-Z]{2,}$ ]]; then
+            elif [[ "$domain" =~ ^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$ ]]; then
                 DOMAINS+=("$domain")
                 log_success "Added domain: $domain"
             else
                 log_error "Invalid domain format"
+                log_info "Examples: example.com, mail.example.com, my-domain.org"
             fi
         done
     fi
