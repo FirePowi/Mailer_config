@@ -67,12 +67,12 @@ ask_question() {
     local response
     
     if [[ -n "$default" ]]; then
-        echo -e "${YELLOW}${question}${NC} ${WHITE}[${default}]${NC}"
+        echo -ne "${YELLOW}${question}${NC} ${WHITE}[${default}]${NC} "
     else
-        echo -e "${YELLOW}${question}${NC}"
+        echo -ne "${YELLOW}${question}${NC} "
     fi
     
-    read -r response
+    read -r response || true
     echo "${response:-$default}"
 }
 
@@ -82,12 +82,12 @@ ask_yes_no() {
     local response
     
     if [[ "$default" == "y" ]]; then
-        echo -e "${YELLOW}${question}${NC} ${WHITE}[Y/n]${NC}"
+        echo -ne "${YELLOW}${question}${NC} ${WHITE}[Y/n]${NC} "
     else
-        echo -e "${YELLOW}${question}${NC} ${WHITE}[y/N]${NC}"
+        echo -ne "${YELLOW}${question}${NC} ${WHITE}[y/N]${NC} "
     fi
     
-    read -r response
+    read -r response || true
     response="${response:-$default}"
     
     if [[ "$response" =~ ^[Yy]$ ]]; then
