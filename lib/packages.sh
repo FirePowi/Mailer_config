@@ -4,6 +4,10 @@
 # Handles package name mapping and installation across distributions
 #
 
+# Source UI library for colors and formatting
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/ui.sh"
+
 # ============================================================================
 # PACKAGE NAME MAPPING
 # ============================================================================

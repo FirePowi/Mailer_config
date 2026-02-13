@@ -4,6 +4,10 @@
 # Handles distribution detection and root checking
 #
 
+# Source UI library for colors and formatting functions
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/ui.sh"
+
 detect_distribution() {
     print_section "Detecting Linux Distribution"
     

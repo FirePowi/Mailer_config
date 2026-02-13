@@ -4,6 +4,10 @@
 # Handles interactive user input for configuration
 #
 
+# Source UI library for colors and formatting
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/ui.sh"
+
 collect_basic_info() {
     print_section "Basic Configuration"
     
