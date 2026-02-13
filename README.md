@@ -74,15 +74,15 @@
 - **2 GB RAM minimum** (4 GB recommended)
 - **20 GB disk space** (more for email storage)
 - **Static IP address** (required for mail server)
-- **Valid domain name(s)** with DNS access
+- **Valid domain name(s)** - We'll help you configure DNS!
 - **Open ports**: 25, 143, 587, 993, 995 (mail), 80, 443 (web)
 
-### DNS Prerequisites
-Before installation, ensure you have:
-- MX record pointing to your mail server
-- A record for your mail hostname
-- Reverse DNS (PTR) record configured
-- (Optional) SPF, DKIM, DMARC records
+### What You Need to Know
+**Nothing!** This installer is designed for users with zero mail server experience:
+- ✅ **No DNS knowledge required** - Interactive DNS setup guide included
+- ✅ **No Linux expertise needed** - We detect your system automatically
+- ✅ **No security configuration** - Mozilla Modern cipher suites pre-configured
+- ✅ **No manual setup** - Everything is automated with helpful prompts
 
 ## 🎯 Quick Start
 
@@ -91,23 +91,24 @@ Before installation, ensure you have:
 ```bash
 git clone gh:FirePowi/Mailer_config
 cd Mailer_config/.specify/scripts/bash
-chmod +x install-mail-server.sh
+chmod +x install.sh
 ```
 
 ### 2. Run the Installer
 
 ```bash
-sudo ./install-mail-server.sh
+sudo ./install.sh
 ```
 
 The script will:
-1. ✅ Detect your Linux distribution
+1. ✅ Detect your Linux distribution automatically
 2. ✅ Check system requirements
-3. ✅ Ask questions interactively
-4. ✅ Install and configure all components
-5. ✅ Generate SSL certificates
-6. ✅ Start and enable services
-7. ✅ Display credentials and next steps
+3. ✅ Ask simple questions interactively
+4. ✅ **Guide you through DNS setup step-by-step** (no prior knowledge needed!)
+5. ✅ Install and configure all components
+6. ✅ Generate SSL certificates automatically
+7. ✅ Start and enable services
+8. ✅ Display credentials and detailed next steps
 
 ### 3. Follow the Interactive Prompts
 
@@ -120,16 +121,45 @@ The installer will ask you:
 - **Webmail client** (SnappyMail, Roundcube, SOGo, or none)
 - **Web server** (Nginx or Apache, or auto-detect)
 
+**Then we guide you through DNS setup!** No need to know anything about DNS - we provide:
+- ✅ Step-by-step instructions for popular DNS providers (Cloudflare, GoDaddy, Namecheap, Google)
+- ✅ Copy-paste ready DNS records
+- ✅ Visual guides for each provider
+- ✅ Explanation of what each record does
+
 ## 📖 Documentation
 
 ### Installation Guide
 See [INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md) for:
 - Detailed installation walkthrough
 - Component selection guide
+- **DNS setup for complete beginners** (step-by-step with screenshots)
 - SSL/TLS security features
 - Post-installation configuration
-- DNS setup examples
 - Troubleshooting tips
+
+### Code Structure
+The installer uses a **modular architecture** for easy maintenance and understanding:
+
+```
+install.sh              # Main installer (orchestration)
+lib/
+├── config.sh          # Configuration variables
+├── ui.sh              # User interface and colors
+├── system.sh          # Distribution detection
+├── packages.sh        # Package management
+├── dns.sh             # DNS configuration helper
+└── input.sh           # User input collection
+
+# Legacy monolithic file (being phased out)
+install-mail-server.sh  # Contains postfix, dovecot, webmail, ssl configs
+```
+
+**Benefits of modular structure:**
+- ✅ Easy to understand (small, focused files)
+- ✅ Easy to maintain (change one module without affecting others)
+- ✅ Easy to extend (add new features in new modules)
+- ✅ Easy to test (test individual modules)
 
 ### Webmail Features
 See [WEBMAIL_FEATURES.md](WEBMAIL_FEATURES.md) for:

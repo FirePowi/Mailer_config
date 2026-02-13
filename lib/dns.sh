@@ -1,0 +1,446 @@
+#!/usr/bin/env bash
+#
+# DNS Configuration Helper Library
+# Guides users through DNS setup step-by-step
+#
+
+get_server_ip() {
+    # Try multiple methods to get public IP
+    ip=$(curl -s ifconfig.me 2>/dev/null || curl -s icanhazip.com 2>/dev/null || curl -s ipinfo.io/ip 2>/dev/null)
+    
+    if [[ -z "$ip" ]]; then
+        # Fallback to local IP if public IP detection fails
+        ip=$(ip addr show | grep 'inet ' | grep -v '127.0.0.1' | head -1 | awk '{print $2}' | cut -d/ -f1)
+    fi
+    
+    echo "$ip"
+}
+
+test_dns_records() {
+    print_section "Testing DNS Configuration"
+    
+    log_info "Detecting server IP address..."
+    local server_ip
+    server_ip=$(get_server_ip)
+    
+    if [[ -z "$server_ip" ]]; then
+        log_error "Could not detect server IP address"
+        server_ip="YOUR_SERVER_IP"
+    else
+        log_success "Server IP: $server_ip"
+    fi
+    
+    SERVER_IP="$server_ip"
+    
+    log_info "Checking DNS records for $PRIMARY_DOMAIN..."
+    echo ""
+    
+    # Check A record for hostname
+    local resolved_ip
+    resolved_ip=$(dig +short "$HOSTNAME" A 2>/dev/null | head -1)
+    
+    if [[ -n "$resolved_ip" ]]; then
+        if [[ "$resolved_ip" == "$server_ip" ]]; then
+            log_success "A record for $HOSTNAME resolves correctly to $server_ip"
+        else
+            log_warning "A record for $HOSTNAME resolves to $resolved_ip (expected: $server_ip)"
+        fi
+    else
+        log_warning "A record for $HOSTNAME not found"
+    fi
+    
+    # Check MX record
+    local mx_record
+    mx_record=$(dig +short "$PRIMARY_DOMAIN" MX 2>/dev/null | head -1)
+    
+    if [[ -n "$mx_record" ]]; then
+        log_success "MX record found: $mx_record"
+    else
+        log_warning "MX record for $PRIMARY_DOMAIN not found"
+    fi
+    
+    # Check reverse DNS
+    local ptr_record
+    ptr_record=$(dig +short -x "$server_ip" 2>/dev/null | head -1)
+    
+    if [[ -n "$ptr_record" ]]; then
+        log_success "Reverse DNS (PTR) found: $ptr_record"
+    else
+        log_warning "Reverse DNS (PTR) not found for $server_ip"
+    fi
+    
+    echo ""
+}
+
+show_dns_configuration() {
+    print_section "DNS Configuration Guide"
+    
+    cat << EOF
+
+${BOLD}${YELLOW}IMPORTANT: DNS Setup Required${NC}
+
+Your mail server needs specific DNS records to work properly. 
+${GREEN}Don't worry!${NC} We'll guide you through this step-by-step.
+
+${BOLD}${WHITE}Your Server Information:${NC}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${CYAN}Server IP:${NC}      ${WHITE}$SERVER_IP${NC}
+${CYAN}Hostname:${NC}       ${WHITE}$HOSTNAME${NC}
+${CYAN}Primary Domain:${NC} ${WHITE}$PRIMARY_DOMAIN${NC}
+
+${BOLD}${WHITE}Step-by-Step DNS Setup Guide:${NC}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${YELLOW}Step 1: Log into your DNS provider${NC}
+   Common providers: Cloudflare, Namecheap, GoDaddy, Google Domains, etc.
+   Look for "DNS Management", "DNS Settings", or "Zone File Editor"
+
+${YELLOW}Step 2: Add A Record (required)${NC}
+   ${CYAN}Type:${NC}     A
+   ${CYAN}Name:${NC}     ${WHITE}mail${NC} (or ${WHITE}$HOSTNAME${NC})
+   ${CYAN}Value:${NC}    ${WHITE}$SERVER_IP${NC}
+   ${CYAN}TTL:${NC}      3600 (or automatic)
+   
+   ${GREEN}What this does:${NC} Points mail.$PRIMARY_DOMAIN to your server
+
+${YELLOW}Step 3: Add MX Record (required)${NC}
+   ${CYAN}Type:${NC}     MX
+   ${CYAN}Name:${NC}     ${WHITE}@${NC} (or leave blank for root domain)
+   ${CYAN}Value:${NC}    ${WHITE}$HOSTNAME${NC} (or ${WHITE}mail.$PRIMARY_DOMAIN${NC})
+   ${CYAN}Priority:${NC} ${WHITE}10${NC}
+   ${CYAN}TTL:${NC}      3600
+   
+   ${GREEN}What this does:${NC} Tells other servers where to send email for $PRIMARY_DOMAIN
+
+${YELLOW}Step 4: Add Autodiscover Records (recommended)${NC}
+   ${CYAN}Record 1:${NC}
+   Type:     A
+   Name:     ${WHITE}autoconfig${NC}
+   Value:    ${WHITE}$SERVER_IP${NC}
+   
+   ${CYAN}Record 2:${NC}
+   Type:     A
+   Name:     ${WHITE}autodiscover${NC}
+   Value:    ${WHITE}$SERVER_IP${NC}
+   
+   ${GREEN}What this does:${NC} Enables automatic email client configuration
+
+${YELLOW}Step 5: Add SPF Record (recommended)${NC}
+   ${CYAN}Type:${NC}     TXT
+   ${CYAN}Name:${NC}     ${WHITE}@${NC} (root domain)
+   ${CYAN}Value:${NC}    ${WHITE}"v=spf1 mx a ~all"${NC}
+   
+   ${GREEN}What this does:${NC} Prevents email spoofing, improves deliverability
+
+${YELLOW}Step 6: Add DMARC Record (recommended)${NC}
+   ${CYAN}Type:${NC}     TXT
+   ${CYAN}Name:${NC}     ${WHITE}_dmarc${NC}
+   ${CYAN}Value:${NC}    ${WHITE}"v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL"${NC}
+   
+   ${GREEN}What this does:${NC} Email authentication policy and reporting
+
+${BOLD}${WHITE}Additional Domains Configuration:${NC}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EOF
+
+    if [[ ${#DOMAINS[@]} -gt 1 ]]; then
+        echo ""
+        log_info "For each additional domain, repeat steps 3, 5, and 6 above:"
+        for domain in "${DOMAINS[@]}"; do
+            if [[ "$domain" != "$PRIMARY_DOMAIN" ]]; then
+                echo "  • $domain"
+            fi
+        done
+    fi
+    
+    cat << EOF
+
+${BOLD}${WHITE}Reverse DNS (PTR Record):${NC}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${YELLOW}Important:${NC} Contact your ${BOLD}server/VPS provider${NC} to set this up.
+They control the reverse DNS for $SERVER_IP
+
+${CYAN}What to request:${NC}
+"Please set the PTR record for $SERVER_IP to point to $HOSTNAME"
+
+${GREEN}What this does:${NC} Prevents your emails from being marked as spam
+
+${BOLD}${WHITE}How to Check DNS Records:${NC}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+After adding DNS records, verify them with these commands:
+
+${CYAN}Check A record:${NC}
+   dig $HOSTNAME A
+
+${CYAN}Check MX record:${NC}
+   dig $PRIMARY_DOMAIN MX
+
+${CYAN}Check SPF record:${NC}
+   dig $PRIMARY_DOMAIN TXT
+
+${CYAN}Check reverse DNS:${NC}
+   dig -x $SERVER_IP
+
+${GREEN}Or use online tools:${NC}
+   • https://mxtoolbox.com/
+   • https://www.whatsmydns.net/
+
+${BOLD}${YELLOW}⏰ DNS Propagation Time:${NC}
+DNS changes can take 15 minutes to 48 hours to propagate worldwide.
+You can continue with the installation - the server will be ready when DNS propagates.
+
+${BOLD}${WHITE}Quick Copy-Paste Records (for your DNS provider):${NC}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EOF
+
+    cat << DNSEOF
+
+# A Records
+mail                A       $SERVER_IP
+autoconfig          A       $SERVER_IP
+autodiscover        A       $SERVER_IP
+
+# MX Record
+@                   MX 10   $HOSTNAME.
+
+# TXT Records (SPF and DMARC)
+@                   TXT     "v=spf1 mx a ~all"
+_dmarc              TXT     "v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL"
+
+${CYAN}Note:${NC} The dot after $HOSTNAME is important for the MX record!
+
+DNSEOF
+
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    
+    if ask_yes_no "Have you added these DNS records (or want to continue anyway)?" "n"; then
+        log_success "Continuing with installation..."
+    else
+        log_info "No problem! You can run this script again after setting up DNS."
+        log_info "Your DNS records are saved above for reference."
+        echo ""
+        if ask_yes_no "Do you want to continue anyway?" "n"; then
+            log_warning "Continuing without DNS verification..."
+        else
+            log_info "Installation cancelled. Run this script again when DNS is ready!"
+            exit 0
+        fi
+    fi
+}
+
+interactive_dns_setup() {
+    print_section "Interactive DNS Setup Assistant"
+    
+    cat << EOF
+
+${BOLD}${CYAN}Welcome to the DNS Setup Assistant!${NC}
+
+We'll walk you through setting up DNS records step-by-step.
+This will only take a few minutes.
+
+${GREEN}What you'll need:${NC}
+• Access to your domain's DNS settings
+• Your domain registrar login (GoDaddy, Namecheap, etc.)
+  OR Cloudflare account if you use their DNS
+
+${YELLOW}Don't worry if you're not sure - we'll guide you!${NC}
+
+EOF
+
+    if ! ask_yes_no "Ready to start DNS setup?" "y"; then
+        log_warning "Skipping DNS setup for now"
+        return 0
+    fi
+    
+    # Guide through each DNS provider
+    echo ""
+    echo -e "${YELLOW}Where is your domain's DNS managed?${NC}"
+    echo -e "${CYAN}1)${NC} Cloudflare"
+    echo -e "${CYAN}2)${NC} GoDaddy"
+    echo -e "${CYAN}3)${NC} Namecheap"
+    echo -e "${CYAN}4)${NC} Google Domains / Google Cloud DNS"
+    echo -e "${CYAN}5)${NC} Other / Not sure"
+    echo ""
+    
+    local dns_provider
+    dns_provider=$(ask_question "Select your DNS provider [1-5]:" "5")
+    
+    case "$dns_provider" in
+        1)
+            show_cloudflare_guide
+            ;;
+        2)
+            show_godaddy_guide
+            ;;
+        3)
+            show_namecheap_guide
+            ;;
+        4)
+            show_google_guide
+            ;;
+        *)
+            show_generic_guide
+            ;;
+    esac
+}
+
+show_cloudflare_guide() {
+    cat << EOF
+
+${BOLD}${CYAN}Cloudflare DNS Setup:${NC}
+
+${YELLOW}1.${NC} Go to: https://dash.cloudflare.com/
+${YELLOW}2.${NC} Select your domain: ${WHITE}$PRIMARY_DOMAIN${NC}
+${YELLOW}3.${NC} Click "DNS" in the top menu
+${YELLOW}4.${NC} Click "Add record" button
+
+${BOLD}Add these 3 A records:${NC}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Type: A    | Name: mail          | IPv4: $SERVER_IP | Proxy: OFF
+Type: A    | Name: autoconfig    | IPv4: $SERVER_IP | Proxy: OFF  
+Type: A    | Name: autodiscover  | IPv4: $SERVER_IP | Proxy: OFF
+
+${YELLOW}IMPORTANT:${NC} Turn ${BOLD}OFF${NC} the orange cloud (proxy) for mail records!
+
+${BOLD}Add MX record:${NC}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Type: MX   | Name: @             | Server: $HOSTNAME | Priority: 10
+
+${BOLD}Add TXT records:${NC}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Type: TXT  | Name: @             | Content: v=spf1 mx a ~all
+Type: TXT  | Name: _dmarc        | Content: v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL
+
+${GREEN}✓ Done!${NC} Cloudflare DNS updates usually take 2-5 minutes.
+
+EOF
+    pause_for_user
+}
+
+show_godaddy_guide() {
+    cat << EOF
+
+${BOLD}${CYAN}GoDaddy DNS Setup:${NC}
+
+${YELLOW}1.${NC} Go to: https://dcc.godaddy.com/manage/dns
+${YELLOW}2.${NC} Find domain: ${WHITE}$PRIMARY_DOMAIN${NC} and click "DNS"
+${YELLOW}3.${NC} Scroll to "Records" section
+${YELLOW}4.${NC} Click "Add" for each record below
+
+${BOLD}A Records:${NC}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Type: A    | Name: mail          | Value: $SERVER_IP | TTL: 1 Hour
+Type: A    | Name: autoconfig    | Value: $SERVER_IP | TTL: 1 Hour
+Type: A    | Name: autodiscover  | Value: $SERVER_IP | TTL: 1 Hour
+
+${BOLD}MX Record:${NC}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Type: MX   | Name: @             | Value: $HOSTNAME | Priority: 10 | TTL: 1 Hour
+
+${BOLD}TXT Records:${NC}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Type: TXT  | Name: @             | Value: v=spf1 mx a ~all
+Type: TXT  | Name: _dmarc        | Value: v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL
+
+${GREEN}✓ Done!${NC} GoDaddy DNS updates usually take 10-30 minutes.
+
+EOF
+    pause_for_user
+}
+
+show_namecheap_guide() {
+    cat << EOF
+
+${BOLD}${CYAN}Namecheap DNS Setup:${NC}
+
+${YELLOW}1.${NC} Go to: https://ap.www.namecheap.com/domains/list/
+${YELLOW}2.${NC} Click "Manage" next to: ${WHITE}$PRIMARY_DOMAIN${NC}
+${YELLOW}3.${NC} Click "Advanced DNS" tab
+${YELLOW}4.${NC} Click "Add New Record" for each entry
+
+${BOLD}A Records:${NC}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Type: A Record  | Host: mail          | Value: $SERVER_IP
+Type: A Record  | Host: autoconfig    | Value: $SERVER_IP
+Type: A Record  | Host: autodiscover  | Value: $SERVER_IP
+
+${BOLD}MX Record:${NC}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Type: MX Record | Host: @             | Value: $HOSTNAME | Priority: 10
+
+${BOLD}TXT Records:${NC}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Type: TXT Record | Host: @            | Value: v=spf1 mx a ~all
+Type: TXT Record | Host: _dmarc       | Value: v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL
+
+${GREEN}✓ Done!${NC} Namecheap DNS updates usually take 5-30 minutes.
+
+EOF
+    pause_for_user
+}
+
+show_google_guide() {
+    cat << EOF
+
+${BOLD}${CYAN}Google Domains / Cloud DNS Setup:${NC}
+
+${YELLOW}1.${NC} Go to: https://domains.google.com/ (or cloud.google.com/dns)
+${YELLOW}2.${NC} Click your domain: ${WHITE}$PRIMARY_DOMAIN${NC}
+${YELLOW}3.${NC} Click "DNS" in the left menu
+${YELLOW}4.${NC} Scroll to "Custom records" and click "Manage custom records"
+
+${BOLD}Add these records:${NC}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Host name     | Type | TTL  | Data
+mail          | A    | 3600 | $SERVER_IP
+autoconfig    | A    | 3600 | $SERVER_IP
+autodiscover  | A    | 3600 | $SERVER_IP
+@             | MX   | 3600 | 10 $HOSTNAME
+@             | TXT  | 3600 | v=spf1 mx a ~all
+_dmarc        | TXT  | 3600 | v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL
+
+${GREEN}✓ Done!${NC} Google DNS updates usually take 5-15 minutes.
+
+EOF
+    pause_for_user
+}
+
+show_generic_guide() {
+    cat << EOF
+
+${BOLD}${CYAN}Generic DNS Setup Guide:${NC}
+
+Look for these sections in your DNS control panel:
+• "DNS Management"
+• "DNS Settings"  
+• "Zone File Editor"
+• "Manage DNS Records"
+
+${BOLD}You need to add these records:${NC}
+
+${YELLOW}A Records (3 entries):${NC}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Name/Host          | Type | Value/Points To
+mail               | A    | $SERVER_IP
+autoconfig         | A    | $SERVER_IP
+autodiscover       | A    | $SERVER_IP
+
+${YELLOW}MX Record (1 entry):${NC}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Name/Host          | Type | Value/Points To      | Priority
+@  (or blank)      | MX   | $HOSTNAME           | 10
+
+${YELLOW}TXT Records (2 entries):${NC}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Name/Host          | Type | Value/Content
+@  (or blank)      | TXT  | v=spf1 mx a ~all
+_dmarc             | TXT  | v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL
+
+${GREEN}✓ Save each record after adding it!${NC}
+
+EOF
+    pause_for_user
+}
