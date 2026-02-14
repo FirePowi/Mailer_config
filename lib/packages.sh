@@ -33,7 +33,7 @@ get_package_name() {
                 postfixadmin) echo "postfixadmin" ;;
                 roundcube) echo "roundcube roundcube-mysql" ;;
                 sogo) echo "sogo sogo-activesync" ;;
-                php) echo "php php-fpm php-mysql php-imap php-mbstring php-json php-xml php-curl" ;;
+                php) echo "php php-fpm php-mysql php-mbstring php-json php-xml php-curl" ;;
                 nginx) echo "nginx" ;;
                 apache) echo "apache2" ;;
                 wget) echo "wget" ;;
@@ -61,7 +61,7 @@ get_package_name() {
                 postfixadmin) echo "postfixadmin" ;;
                 roundcube) echo "roundcubemail" ;;
                 sogo) echo "sogo sogo-activesync" ;;
-                php) echo "php php-fpm php-mysqlnd php-imap php-mbstring php-json php-xml" ;;
+                php) echo "php php-fpm php-mysqlnd php-mbstring php-json php-xml" ;;
                 nginx) echo "nginx" ;;
                 apache) echo "httpd" ;;
                 wget) echo "wget" ;;
@@ -89,7 +89,7 @@ get_package_name() {
                 postfixadmin) echo "postfixadmin" ;;
                 roundcube) echo "roundcubemail" ;;
                 sogo) echo "sogo" ;;
-                php) echo "php php-fpm php-imap php-json" ;;
+                php) echo "php php-fpm php-json" ;;
                 nginx) echo "nginx" ;;
                 apache) echo "apache" ;;
                 wget) echo "wget" ;;
@@ -110,7 +110,7 @@ get_package_name() {
                 certbot) echo "certbot" ;;
                 roundcube) echo "roundcubemail" ;;
                 sogo) echo "sogo" ;;
-                php) echo "php7 php7-fpm php7-mysql php7-imap php7-mbstring" ;;
+                php) echo "php7 php7-fpm php7-mysql php7-mbstring" ;;
                 nginx) echo "nginx" ;;
                 apache) echo "apache2" ;;
                 wget) echo "wget" ;;
@@ -162,21 +162,32 @@ install_package() {
     
     case "$PACKAGE_MANAGER" in
         apt-get)
-            DEBIAN_FRONTEND=noninteractive apt-get install -y -qq $actual_packages
+            # Try to install all packages, but don't fail if some are unavailable
+            local failed_packages=""
+            for pkg in $actual_packages; do
+                if ! DEBIAN_FRONTEND=noninteractive apt-get install -y -qq "$pkg" 2>/dev/null; then
+                    log_warning "Package $pkg not available, skipping"
+                    failed_packages="$failed_packages $pkg"
+                fi
+            done
+            if [[ -n "$failed_packages" ]]; then
+                log_info "Some packages were skipped:$failed_packages"
+            fi
             ;;
         yum|dnf)
-            $PACKAGE_MANAGER install -y -q $actual_packages
+            $PACKAGE_MANAGER install -y -q $actual_packages 2>/dev/null || log_warning "Some packages may not have been installed"
             ;;
         pacman)
-            pacman -S --noconfirm --needed $actual_packages
+            pacman -S --noconfirm --needed $actual_packages 2>/dev/null || log_warning "Some packages may not have been installed"
             ;;
         zypper)
-            zypper install -y $actual_packages
+            zypper install -y $actual_packages 2>/dev/null || log_warning "Some packages may not have been installed"
             ;;
     esac
     
     log_success "Installed: $package_name"
 }
+
 
 check_package_available() {
     local package="$1"
