@@ -16,7 +16,7 @@ collect_basic_info() {
     
     # Primary domain
     while true; do
-        echo -e "${YELLOW}Enter your primary mail domain (e.g., example.com):${NC} "
+        printf "${YELLOW}Enter your primary mail domain (e.g., example.com):${NC} "
         read -r PRIMARY_DOMAIN < /dev/tty || true
         # Trim whitespace
         PRIMARY_DOMAIN=$(echo "$PRIMARY_DOMAIN" | xargs)
@@ -31,23 +31,23 @@ collect_basic_info() {
     done
     
     # Hostname
-    echo -e "${YELLOW}Enter the mail server hostname [mail.$PRIMARY_DOMAIN]:${NC} "
+    printf "${YELLOW}Enter the mail server hostname [mail.$PRIMARY_DOMAIN]:${NC} "
     read -r hostname_input < /dev/tty || true
     HOSTNAME="${hostname_input:-mail.$PRIMARY_DOMAIN}"
     
     # Admin email
-    echo -e "${YELLOW}Enter admin email address [admin@$PRIMARY_DOMAIN]:${NC} "
+    printf "${YELLOW}Enter admin email address [admin@$PRIMARY_DOMAIN]:${NC} "
     read -r email_input < /dev/tty || true
     ADMIN_EMAIL="${email_input:-admin@$PRIMARY_DOMAIN}"
     
     # Additional domains
     echo ""
-    echo -e "${YELLOW}Do you want to add additional domains? [y/N]:${NC} "
+    printf "${YELLOW}Do you want to add additional domains? [y/N]:${NC} "
     read -r add_domains < /dev/tty || true
     
     if [[ "$add_domains" =~ ^[Yy]$ ]]; then
         while true; do
-            echo -e "${YELLOW}Enter additional domain (or press Enter to finish):${NC} "
+            printf "${YELLOW}Enter additional domain (or press Enter to finish):${NC} "
             read -r domain < /dev/tty || true
             # Trim whitespace
             domain=$(echo "$domain" | xargs)
@@ -95,7 +95,7 @@ collect_component_choices() {
     ENABLE_POLICYD_SPF=true
     
     # SpamAssassin
-    echo -e "${YELLOW}Install SpamAssassin? (spam filtering) [Y/n]:${NC} "
+    printf "${YELLOW}Install SpamAssassin? (spam filtering) [Y/n]:${NC} "
     read -r spamassassin_choice < /dev/tty || true
     spamassassin_choice="${spamassassin_choice:-y}"
     if [[ "$spamassassin_choice" =~ ^[Yy]$ ]]; then
@@ -103,7 +103,7 @@ collect_component_choices() {
     fi
     
     # ClamAV
-    echo -e "${YELLOW}Install ClamAV? (antivirus scanning) [y/N]:${NC} "
+    printf "${YELLOW}Install ClamAV? (antivirus scanning) [y/N]:${NC} "
     read -r clamav_choice < /dev/tty || true
     clamav_choice="${clamav_choice:-n}"
     if [[ "$clamav_choice" =~ ^[Yy]$ ]]; then
@@ -112,7 +112,7 @@ collect_component_choices() {
     
     # Rspamd (alternative to SpamAssassin)
     if ! $ENABLE_SPAMASSASSIN; then
-        echo -e "${YELLOW}Install Rspamd? (modern spam filtering alternative) [y/N]:${NC} "
+        printf "${YELLOW}Install Rspamd? (modern spam filtering alternative) [y/N]:${NC} "
         read -r rspamd_choice < /dev/tty || true
         rspamd_choice="${rspamd_choice:-n}"
         if [[ "$rspamd_choice" =~ ^[Yy]$ ]]; then
@@ -122,7 +122,7 @@ collect_component_choices() {
     
     # OpenDKIM
     echo ""
-    echo -e "${YELLOW}Install OpenDKIM? (email authentication) [Y/n]:${NC} "
+    printf "${YELLOW}Install OpenDKIM? (email authentication) [Y/n]:${NC} "
     read -r dkim_choice < /dev/tty || true
     dkim_choice="${dkim_choice:-y}"
     if [[ "$dkim_choice" =~ ^[Yy]$ ]]; then
@@ -186,7 +186,7 @@ collect_component_choices() {
     
     local webmail_selection
     while true; do
-        echo -e "${YELLOW}Select webmail client [1-$option_num] [1]:${NC} "
+        printf "${YELLOW}Select webmail client [1-$option_num] [1]:${NC} "
         read -r webmail_selection < /dev/tty || true
         webmail_selection="${webmail_selection:-1}"
         if [[ "$webmail_selection" =~ ^[0-9]+$ ]] && [[ "$webmail_selection" -ge 1 && "$webmail_selection" -le "$option_num" ]]; then
