@@ -16,8 +16,9 @@ collect_basic_info() {
     
     # Primary domain
     while true; do
-        echo -n "Enter your primary mail domain (e.g., example.com): "
-        read -r PRIMARY_DOMAIN || true
+        echo -ne "${YELLOW}Enter your primary mail domain (e.g., example.com):${NC} "
+        read -r PRIMARY_DOMAIN
+        PRIMARY_DOMAIN="${PRIMARY_DOMAIN:-}"
         # Trim whitespace
         PRIMARY_DOMAIN=$(echo "$PRIMARY_DOMAIN" | xargs)
         # Validate: alphanumeric with dots and hyphens, at least one dot, TLD with 2+ chars
@@ -31,24 +32,28 @@ collect_basic_info() {
     done
     
     # Hostname
-    echo -n "Enter the mail server hostname [mail.$PRIMARY_DOMAIN]: "
-    read -r hostname_input || true
+    echo -ne "${YELLOW}Enter the mail server hostname [mail.$PRIMARY_DOMAIN]:${NC} "
+    read -r hostname_input
+    hostname_input="${hostname_input:-}"
     HOSTNAME="${hostname_input:-mail.$PRIMARY_DOMAIN}"
     
     # Admin email
-    echo -n "Enter admin email address [admin@$PRIMARY_DOMAIN]: "
-    read -r email_input || true
+    echo -ne "${YELLOW}Enter admin email address [admin@$PRIMARY_DOMAIN]:${NC} "
+    read -r email_input
+    email_input="${email_input:-}"
     ADMIN_EMAIL="${email_input:-admin@$PRIMARY_DOMAIN}"
     
     # Additional domains
     echo ""
-    echo -n "Do you want to add additional domains? [y/N]: "
-    read -r add_domains || true
+    echo -ne "${YELLOW}Do you want to add additional domains? [y/N]:${NC} "
+    read -r add_domains
+    add_domains="${add_domains:-}"
     
     if [[ "$add_domains" =~ ^[Yy]$ ]]; then
         while true; do
-            echo -n "Enter additional domain (or press Enter to finish): "
-            read -r domain || true
+            echo -ne "${YELLOW}Enter additional domain (or press Enter to finish):${NC} "
+            read -r domain
+            domain="${domain:-}"
             # Trim whitespace
             domain=$(echo "$domain" | xargs)
             if [[ -z "$domain" ]]; then
@@ -95,16 +100,16 @@ collect_component_choices() {
     ENABLE_POLICYD_SPF=true
     
     # SpamAssassin
-    echo -n "Install SpamAssassin? (spam filtering) [Y/n]: "
-    read -r spamassassin_choice || true
+    echo -ne "${YELLOW}Install SpamAssassin? (spam filtering) [Y/n]:${NC} "
+    read -r spamassassin_choice
     spamassassin_choice="${spamassassin_choice:-y}"
     if [[ "$spamassassin_choice" =~ ^[Yy]$ ]]; then
         ENABLE_SPAMASSASSIN=true
     fi
     
     # ClamAV
-    echo -n "Install ClamAV? (antivirus scanning) [y/N]: "
-    read -r clamav_choice || true
+    echo -ne "${YELLOW}Install ClamAV? (antivirus scanning) [y/N]:${NC} "
+    read -r clamav_choice
     clamav_choice="${clamav_choice:-n}"
     if [[ "$clamav_choice" =~ ^[Yy]$ ]]; then
         ENABLE_CLAMAV=true
@@ -112,8 +117,8 @@ collect_component_choices() {
     
     # Rspamd (alternative to SpamAssassin)
     if ! $ENABLE_SPAMASSASSIN; then
-        echo -n "Install Rspamd? (modern spam filtering alternative) [y/N]: "
-        read -r rspamd_choice || true
+        echo -ne "${YELLOW}Install Rspamd? (modern spam filtering alternative) [y/N]:${NC} "
+        read -r rspamd_choice
         rspamd_choice="${rspamd_choice:-n}"
         if [[ "$rspamd_choice" =~ ^[Yy]$ ]]; then
             ENABLE_RSPAMD=true
@@ -122,8 +127,8 @@ collect_component_choices() {
     
     # OpenDKIM
     echo ""
-    echo -n "Install OpenDKIM? (email authentication) [Y/n]: "
-    read -r dkim_choice || true
+    echo -ne "${YELLOW}Install OpenDKIM? (email authentication) [Y/n]:${NC} "
+    read -r dkim_choice
     dkim_choice="${dkim_choice:-y}"
     if [[ "$dkim_choice" =~ ^[Yy]$ ]]; then
         ENABLE_DKIM=true
@@ -186,8 +191,8 @@ collect_component_choices() {
     
     local webmail_selection
     while true; do
-        echo -n "Select webmail client [1-$option_num] [1]: "
-        read -r webmail_selection || true
+        echo -ne "${YELLOW}Select webmail client [1-$option_num] [1]:${NC} "
+        read -r webmail_selection
         webmail_selection="${webmail_selection:-1}"
         if [[ "$webmail_selection" =~ ^[0-9]+$ ]] && [[ "$webmail_selection" -ge 1 && "$webmail_selection" -le "$option_num" ]]; then
             WEBMAIL_CHOICE="${available_options[$((webmail_selection-1))]}"
