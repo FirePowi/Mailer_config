@@ -27,7 +27,7 @@ source "${LIB_DIR}/progress.sh"  # Progress tracking
 if [ -f "${SCRIPT_DIR}/install-mail-server.sh" ]; then
     source "${SCRIPT_DIR}/install-mail-server.sh"
 else
-    echo "ERROR: install-mail-server.sh not found"
+    echo "ERROR: ${SCRIPT_DIR}/install-mail-server.sh not found"
     exit 1
 fi
 
