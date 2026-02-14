@@ -182,9 +182,8 @@ main() {
         exit 0
     fi
     
-    if [[ -n "$resume_from" ]]; then
-        log_info "Will resume from step: $resume_from"
-    else
+    if [[ -z "$resume_from" ]]; then
+        echo ""
         log_info "Starting fresh installation"
     fi
     

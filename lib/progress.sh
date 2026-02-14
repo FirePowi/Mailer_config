@@ -126,12 +126,11 @@ prompt_resume() {
         return 0  # No previous progress, start fresh
     fi
     
-    show_progress_summary
-    
     local next_step
     next_step=$(get_next_step "$last_step")
     
     if [[ -z "$next_step" ]]; then
+        show_progress_summary
         log_success "Previous installation was completed!"
         echo ""
         if ask_yes_no "Start a fresh installation?" "n"; then
@@ -146,6 +145,8 @@ prompt_resume() {
     echo ""
     
     if ask_yes_no "Resume from where you left off?" "y"; then
+        echo ""
+        show_progress_summary
         log_success "Resuming from step: $next_step"
         echo "$next_step"  # Return the next step to resume from
         return 0
