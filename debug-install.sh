@@ -7,7 +7,7 @@
 #
 
 echo "╔═══════════════════════════════════════════════════════════════╗"
-echo "║        Script de Débogage - Installation Mail Server         ║"
+echo "║        Script de Débogage - Installation Mail Server          ║"
 echo "╚═══════════════════════════════════════════════════════════════╝"
 echo ""
 

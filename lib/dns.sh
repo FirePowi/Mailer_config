@@ -36,17 +36,25 @@ test_dns_records() {
     
     SERVER_IP="$server_ip"
     
+    # Check if dig is available
+    if ! command -v dig &>/dev/null; then
+        log_warning "'dig' command not found - skipping DNS checks"
+        log_info "Install dnsutils (Debian/Ubuntu) or bind-utils (RedHat/CentOS) for DNS verification"
+        echo ""
+        return 0
+    fi
+    
     log_info "Checking DNS records for $PRIMARY_DOMAIN..."
     echo ""
     
     # Check A record or CNAME for hostname
     local resolved_ip
-    resolved_ip=$(dig +short "$HOSTNAME" A 2>/dev/null | head -1)
+    resolved_ip=$(dig +short "$HOSTNAME" A 2>/dev/null | head -1 || true)
     
     # If no A record, check for CNAME and resolve it
     if [[ -z "$resolved_ip" ]]; then
         local cname_target
-        cname_target=$(dig +short "$HOSTNAME" CNAME 2>/dev/null | head -1)
+        cname_target=$(dig +short "$HOSTNAME" CNAME 2>/dev/null | head -1 || true)
         
         if [[ -n "$cname_target" ]]; then
             # Remove trailing dot from CNAME if present
@@ -54,7 +62,7 @@ test_dns_records() {
             log_info "CNAME found: $HOSTNAME -> $cname_target"
             
             # Resolve the CNAME target to get the final IP
-            resolved_ip=$(dig +short "$cname_target" A 2>/dev/null | head -1)
+            resolved_ip=$(dig +short "$cname_target" A 2>/dev/null | head -1 || true)
         fi
     fi
     
@@ -70,7 +78,7 @@ test_dns_records() {
     
     # Check MX record
     local mx_record
-    mx_record=$(dig +short "$PRIMARY_DOMAIN" MX 2>/dev/null | head -1)
+    mx_record=$(dig +short "$PRIMARY_DOMAIN" MX 2>/dev/null | head -1 || true)
     
     if [[ -n "$mx_record" ]]; then
         log_success "MX record found: $mx_record"
@@ -80,7 +88,7 @@ test_dns_records() {
     
     # Check reverse DNS
     local ptr_record
-    ptr_record=$(dig +short -x "$server_ip" 2>/dev/null | head -1)
+    ptr_record=$(dig +short -x "$server_ip" 2>/dev/null | head -1 || true)
     
     if [[ -n "$ptr_record" ]]; then
         log_success "Reverse DNS (PTR) found: $ptr_record"

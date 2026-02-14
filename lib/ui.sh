@@ -87,8 +87,13 @@ ask_yes_no() {
         echo -ne "${YELLOW}${question}${NC} ${WHITE}[y/N]${NC} "
     fi
     
-    read -r response || true
-    response="${response:-$default}"
+    # Force read to wait for input
+    read -r response
+    
+    # Use default if empty response
+    if [[ -z "$response" ]]; then
+        response="$default"
+    fi
     
     if [[ "$response" =~ ^[Yy]$ ]]; then
         return 0
