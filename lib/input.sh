@@ -16,8 +16,7 @@ collect_basic_info() {
     
     # Primary domain
     while true; do
-        echo -e "${YELLOW}Enter your primary mail domain (e.g., example.com):${NC}"
-        read -r PRIMARY_DOMAIN || true
+        read -p "Enter your primary mail domain (e.g., example.com): " PRIMARY_DOMAIN || true
         # Trim whitespace
         PRIMARY_DOMAIN=$(echo "$PRIMARY_DOMAIN" | xargs)
         # Validate: alphanumeric with dots and hyphens, at least one dot, TLD with 2+ chars
@@ -31,26 +30,22 @@ collect_basic_info() {
     done
     
     # Hostname
-    echo -e "${YELLOW}Enter the mail server hostname [mail.$PRIMARY_DOMAIN]:${NC}"
-    read -r hostname_input || true
+    read -p "Enter the mail server hostname [mail.$PRIMARY_DOMAIN]: " hostname_input || true
     HOSTNAME="${hostname_input:-mail.$PRIMARY_DOMAIN}"
     
     # Admin email
     echo -e "${YELLOW}Enter admin email address [admin@$PRIMARY_DOMAIN]:${NC}"
-    read -r email_input || true
-    ADMIN_EMAIL="${email_input:-admin@$PRIMARY_DOMAIN}"
+    read -p "Enter admin email address [admin@$PRIMARY_DOMAIN]: "MAIL="${email_input:-admin@$PRIMARY_DOMAIN}"
     
     # Additional domains
     echo ""
     echo -e "${YELLOW}Do you want to add additional domains? [y/N]:${NC}"
     read -r add_domains || true
-    if [[ "$add_domains" =~ ^[Yy]$ ]]; then
-        while true; do
+    read -p "Do you want to add additional domains? [y/N]: "le true; do
             echo -e "${YELLOW}Enter additional domain (or press Enter to finish):${NC}"
             read -r domain || true
             # Trim whitespace
-            domain=$(echo "$domain" | xargs)
-            if [[ -z "$domain" ]]; then
+            read -p "Enter additional domain (or press Enter to finish): "z "$domain" ]]; then
                 break
             elif [[ "$domain" =~ ^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$ ]]; then
                 DOMAINS+=("$domain")
@@ -98,16 +93,14 @@ collect_component_choices() {
     read -r spamassassin_choice || true
     spamassassin_choice="${spamassassin_choice:-y}"
     if [[ "$spamassassin_choice" =~ ^[Yy]$ ]]; then
-        ENABLE_SPAMASSASSIN=true
-    fi
+    read -p "Install SpamAssassin? (spam filtering) [Y/n]: "
     
     # ClamAV
     echo -e "${YELLOW}Install ClamAV? (antivirus scanning) [y/N]:${NC}"
     read -r clamav_choice || true
     clamav_choice="${clamav_choice:-n}"
     if [[ "$clamav_choice" =~ ^[Yy]$ ]]; then
-        ENABLE_CLAMAV=true
-    fi
+    read -p "Install ClamAV? (antivirus scanning) [y/N]: "
     
     # Rspamd (alternative to SpamAssassin)
     if ! $ENABLE_SPAMASSASSIN; then
@@ -115,8 +108,7 @@ collect_component_choices() {
         read -r rspamd_choice || true
         rspamd_choice="${rspamd_choice:-n}"
         if [[ "$rspamd_choice" =~ ^[Yy]$ ]]; then
-            ENABLE_RSPAMD=true
-        fi
+        read -p "Install Rspamd? (modern spam filtering alternative) [y/N]: "
     fi
     
     # OpenDKIM
@@ -126,8 +118,7 @@ collect_component_choices() {
     dkim_choice="${dkim_choice:-y}"
     if [[ "$dkim_choice" =~ ^[Yy]$ ]]; then
         ENABLE_DKIM=true
-    fi
-    
+    read -p "Install OpenDKIM? (email authentication) [Y/n]: "
     echo ""
     echo -e "${YELLOW}Web-based Management Tools:${NC}"
     
@@ -191,8 +182,7 @@ collect_component_choices() {
         webmail_selection="${webmail_selection:-1}"
         if [[ "$webmail_selection" =~ ^[0-9]+$ ]] && [[ "$webmail_selection" -ge 1 && "$webmail_selection" -le "$option_num" ]]; then
             WEBMAIL_CHOICE="${available_options[$((webmail_selection-1))]}"
-            if [ "$WEBMAIL_CHOICE" = "none" ]; then
-                log_info "Skipping webmail installation"
+        read -p "Select webmail client [1-$option_num] [1]: " log_info "Skipping webmail installation"
             else
                 log_success "Selected: ${WEBMAIL_CHOICE^}"
                 # Detect or choose web server if webmail is being installed
