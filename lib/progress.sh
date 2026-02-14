@@ -122,6 +122,7 @@ prompt_resume() {
     last_step=$(load_progress)
     
     if [[ -z "$last_step" ]]; then
+        log_info "No previous installation found"
         return 0  # No previous progress, start fresh
     fi
     
@@ -133,8 +134,7 @@ prompt_resume() {
     if [[ -z "$next_step" ]]; then
         log_success "Previous installation was completed!"
         echo ""
-        ask_yes_no "Start a fresh installation?" "n"
-        if [[ $? -eq 0 ]]; then
+        if ask_yes_no "Start a fresh installation?" "n"; then
             clear_progress
             return 0
         else
@@ -144,18 +144,17 @@ prompt_resume() {
     
     log_warning "Previous installation was interrupted at step: $last_step"
     echo ""
-    ask_yes_no "Resume from where you left off?" "y"
     
-    if [[ $? -eq 0 ]]; then
+    if ask_yes_no "Resume from where you left off?" "y"; then
         log_success "Resuming from step: $next_step"
         echo "$next_step"  # Return the next step to resume from
         return 0
     else
-        ask_yes_no "Start a fresh installation?" "n"
-        if [[ $? -eq 0 ]]; then
+        if ask_yes_no "Start a fresh installation?" "n"; then
             clear_progress
             return 0
         else
+            log_info "Installation cancelled"
             return 1
         fi
     fi

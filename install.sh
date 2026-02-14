@@ -170,12 +170,22 @@ main() {
     print_header
     
     # Check for previous progress and optionally resume
+    echo ""
+    log_info "Checking for previous installation progress..."
+    
     local resume_from
     resume_from=$(prompt_resume)
+    local resume_status=$?
     
-    if [[ $? -ne 0 ]]; then
-        log_warning "Installation cancelled"
+    if [[ $resume_status -ne 0 ]]; then
+        log_warning "Installation cancelled by user"
         exit 0
+    fi
+    
+    if [[ -n "$resume_from" ]]; then
+        log_info "Will resume from step: $resume_from"
+    else
+        log_info "Starting fresh installation"
     fi
     
     # Run all installation steps
