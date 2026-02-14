@@ -25,6 +25,8 @@ chmod +x install.sh
 sudo ./install.sh
 ```
 
+**⚠️ Important:** Use `install.sh` (modular architecture v2.0), NOT `install-mail-server.sh` (obsolete).
+
 **That's it!** The installer will:
 1. Detect your system automatically
 2. Ask simple questions interactively

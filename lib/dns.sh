@@ -39,18 +39,33 @@ test_dns_records() {
     log_info "Checking DNS records for $PRIMARY_DOMAIN..."
     echo ""
     
-    # Check A record for hostname
+    # Check A record or CNAME for hostname
     local resolved_ip
     resolved_ip=$(dig +short "$HOSTNAME" A 2>/dev/null | head -1)
     
+    # If no A record, check for CNAME and resolve it
+    if [[ -z "$resolved_ip" ]]; then
+        local cname_target
+        cname_target=$(dig +short "$HOSTNAME" CNAME 2>/dev/null | head -1)
+        
+        if [[ -n "$cname_target" ]]; then
+            # Remove trailing dot from CNAME if present
+            cname_target="${cname_target%.}"
+            log_info "CNAME found: $HOSTNAME -> $cname_target"
+            
+            # Resolve the CNAME target to get the final IP
+            resolved_ip=$(dig +short "$cname_target" A 2>/dev/null | head -1)
+        fi
+    fi
+    
     if [[ -n "$resolved_ip" ]]; then
         if [[ "$resolved_ip" == "$server_ip" ]]; then
-            log_success "A record for $HOSTNAME resolves correctly to $server_ip"
+            log_success "DNS for $HOSTNAME resolves correctly to $server_ip"
         else
-            log_warning "A record for $HOSTNAME resolves to $resolved_ip (expected: $server_ip)"
+            log_warning "DNS for $HOSTNAME resolves to $resolved_ip (expected: $server_ip)"
         fi
     else
-        log_warning "A record for $HOSTNAME not found"
+        log_warning "No A record or CNAME found for $HOSTNAME"
     fi
     
     # Check MX record
@@ -102,13 +117,21 @@ show_dns_configuration() {
     echo -e "   Common providers: Cloudflare, Namecheap, GoDaddy, Google Domains, etc."
     echo -e "   Look for \"DNS Management\", \"DNS Settings\", or \"Zone File Editor\""
     echo -e ""
-    echo -e "${YELLOW}Step 2: Add A Record (required)${NC}"
+    echo -e "${YELLOW}Step 2: Add A Record or CNAME (required)${NC}"
+    echo -e "   ${BOLD}Option A - A Record:${NC}"
     echo -e "   ${CYAN}Type:${NC}     A"
     echo -e "   ${CYAN}Name:${NC}     ${WHITE}mail${NC} (or ${WHITE}$HOSTNAME${NC})"
     echo -e "   ${CYAN}Value:${NC}    ${WHITE}$SERVER_IP${NC}"
     echo -e "   ${CYAN}TTL:${NC}      3600 (or automatic)"
     echo -e ""
+    echo -e "   ${BOLD}Option B - CNAME Record:${NC}"
+    echo -e "   ${CYAN}Type:${NC}     CNAME"
+    echo -e "   ${CYAN}Name:${NC}     ${WHITE}mail${NC}"
+    echo -e "   ${CYAN}Value:${NC}    ${WHITE}your-server.example.com${NC} (hostname that points to $SERVER_IP)"
+    echo -e "   ${CYAN}TTL:${NC}      3600"
+    echo -e ""
     echo -e "   ${GREEN}What this does:${NC} Points mail.$PRIMARY_DOMAIN to your server"
+    echo -e "   ${GREEN}Note:${NC} Both A and CNAME records are accepted if they resolve to $SERVER_IP"
     echo -e ""
     echo -e "${YELLOW}Step 3: Add MX Record (required)${NC}"
     echo -e "   ${CYAN}Type:${NC}     MX"

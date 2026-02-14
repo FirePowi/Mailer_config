@@ -15,21 +15,20 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LIB_DIR="${SCRIPT_DIR}/lib"
 
 # Load all library modules
-source "${LIB_DIR}/config.sh"    # Configuration variables
-source "${LIB_DIR}/ui.sh"        # UI functions and colors
-source "${LIB_DIR}/system.sh"    # System detection
-source "${LIB_DIR}/packages.sh"  # Package management
-source "${LIB_DIR}/dns.sh"       # DNS configuration helper
-source "${LIB_DIR}/input.sh"     # User input collection
-source "${LIB_DIR}/progress.sh"  # Progress tracking
-
-# We need functions from the monolithic script for now
-if [ -f "${SCRIPT_DIR}/install-mail-server.sh" ]; then
-    source "${SCRIPT_DIR}/install-mail-server.sh"
-else
-    echo "ERROR: ${SCRIPT_DIR}/install-mail-server.sh not found"
-    exit 1
-fi
+source "${LIB_DIR}/config.sh"       # Configuration variables
+source "${LIB_DIR}/ui.sh"           # UI functions and colors
+source "${LIB_DIR}/system.sh"       # System detection
+source "${LIB_DIR}/packages.sh"     # Package management
+source "${LIB_DIR}/dns.sh"          # DNS configuration helper
+source "${LIB_DIR}/input.sh"        # User input collection
+source "${LIB_DIR}/progress.sh"     # Progress tracking
+source "${LIB_DIR}/database.sh"     # Database setup
+source "${LIB_DIR}/postfix.sh"      # Postfix configuration
+source "${LIB_DIR}/dovecot.sh"      # Dovecot configuration
+source "${LIB_DIR}/ssl.sh"          # SSL/TLS certificates
+source "${LIB_DIR}/autodiscover.sh" # Email client autodiscovery
+source "${LIB_DIR}/webmail.sh"      # Webmail installation
+source "${LIB_DIR}/services.sh"     # Service management
 
 # ============================================================================
 # INSTALLATION STEP FUNCTIONS
