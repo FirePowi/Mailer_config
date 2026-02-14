@@ -64,14 +64,14 @@ get_next_step() {
     local last_step="$1"
     
     if [[ -z "$last_step" ]]; then
-        echo "${INSTALL_STEPS[0]}"
+        printf "%s" "${INSTALL_STEPS[0]}"
         return
     fi
     
     local found=false
     for step in "${INSTALL_STEPS[@]}"; do
         if [[ "$found" == true ]]; then
-            echo "$step"
+            printf "%s" "$step"
             return
         fi
         if [[ "$step" == "$last_step" ]]; then
@@ -79,18 +79,18 @@ get_next_step() {
         fi
     done
     
-    echo ""  # No more steps
+    printf ""  # No more steps
 }
 
 show_progress_summary() {
     if [[ ! -f "$PROGRESS_FILE" ]]; then
-        log_info "No previous installation progress found"
+        log_info "$(t 'progress.no_previous')"
         return
     fi
     
-    print_section "Previous Installation Progress"
+    print_section "$(t 'progress.title')"
     
-    echo -e "${CYAN}Completed steps:${NC}"
+    echo -e "${CYAN}$(t 'progress.completed_steps')${NC}"
     while IFS=: read -r step status timestamp; do
         local date_str=$(date -d "@$timestamp" "+%Y-%m-%d %H:%M:%S" 2>/dev/null || date -r "$timestamp" "+%Y-%m-%d %H:%M:%S" 2>/dev/null || echo "")
         
@@ -122,7 +122,7 @@ prompt_resume() {
     last_step=$(load_progress)
     
     if [[ -z "$last_step" ]]; then
-        log_info "No previous installation found"
+        log_info "$(t 'progress.no_previous')"
         return 0  # No previous progress, start fresh
     fi
     
@@ -131,9 +131,9 @@ prompt_resume() {
     
     if [[ -z "$next_step" ]]; then
         show_progress_summary
-        log_success "Previous installation was completed!"
+        log_success "$(t 'progress.completed')"
         echo ""
-        if ask_yes_no "Start a fresh installation?" "n"; then
+        if ask_yes_no "$(t 'progress.fresh_question')" "n"; then
             clear_progress
             return 0
         else
@@ -141,21 +141,21 @@ prompt_resume() {
         fi
     fi
     
-    log_warning "Previous installation was interrupted at step: $last_step"
+    log_warning "$(t 'progress.interrupted') $last_step"
     echo ""
     
-    if ask_yes_no "Resume from where you left off?" "y"; then
+    if ask_yes_no "$(t 'progress.resume_question')" "y"; then
         echo ""
         show_progress_summary
-        log_success "Resuming from step: $next_step"
-        echo "$next_step"  # Return the next step to resume from
+        log_success "$(t 'progress.resuming') $next_step"
+        printf "%s" "$next_step"  # Return the next step to resume from
         return 0
     else
-        if ask_yes_no "Start a fresh installation?" "n"; then
+        if ask_yes_no "$(t 'progress.fresh_question')" "n"; then
             clear_progress
             return 0
         else
-            log_info "Installation cancelled"
+            log_info "$(t 'progress.cancelled')"
             return 1
         fi
     fi

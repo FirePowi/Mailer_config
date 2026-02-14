@@ -25,13 +25,13 @@ BOLD='\033[1m'
 print_header() {
     clear
     echo -e "${BOLD}${CYAN}"
-    echo "╔═══════════════════════════════════════════════════════════════════════╗"
-    echo "║                                                                       ║"
-    echo "║             Interactive Mail Server Installation Script               ║"
-    echo "║                                                                       ║"
-    echo "║        Postfix + Dovecot + SpamAssassin + Policyd-SPF + More          ║"
-    echo "║                                                                       ║"
-    echo "╚═══════════════════════════════════════════════════════════════════════╝"
+    echo -e "╔═══════════════════════════════════════════════════════════════════════╗"
+    echo -e "║                                                                       ║"
+    echo -e "║             Interactive Mail Server Installation Script               ║"
+    echo -e "║                                                                       ║"
+    echo -e "║        Postfix + Dovecot + SpamAssassin + Policyd-SPF + More          ║"
+    echo -e "║                                                                       ║"
+    echo -e "╚═══════════════════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
 }
 
@@ -72,8 +72,8 @@ ask_question() {
         echo -ne "${YELLOW}${question}${NC} "
     fi
     
-    read -r response || true
-    echo "${response:-$default}"
+    read -r response
+    printf "%s" "${response:-$default}"
 }
 
 ask_yes_no() {
@@ -103,6 +103,6 @@ ask_yes_no() {
 }
 
 pause_for_user() {
-    echo -e "\n${CYAN}Press Enter to continue...${NC}"
+    echo -e "\n${CYAN}$(t 'prompt.press_enter')${NC}"
     read -r
 }

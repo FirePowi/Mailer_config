@@ -16,6 +16,7 @@ LIB_DIR="${SCRIPT_DIR}/lib"
 
 # Load all library modules
 source "${LIB_DIR}/config.sh"       # Configuration variables
+source "${LIB_DIR}/i18n.sh"         # Internationalization
 source "${LIB_DIR}/ui.sh"           # UI functions and colors
 source "${LIB_DIR}/system.sh"       # System detection
 source "${LIB_DIR}/packages.sh"     # Package management
@@ -36,7 +37,7 @@ source "${LIB_DIR}/services.sh"     # Service management
 
 run_detect_system() {
     if should_skip_step "detect_system"; then
-        log_info "Skipping: System detection (already completed)"
+        log_info "$(t 'skip.already_completed' "$(t 'step.detect_system')")"
         return 0
     fi
     
@@ -47,7 +48,7 @@ run_detect_system() {
 
 run_collect_info() {
     if should_skip_step "collect_info"; then
-        log_info "Skipping: User configuration (already completed)"
+        log_info "$(t 'skip.already_completed' "$(t 'step.collect_info')")"
         return 0
     fi
     
@@ -59,7 +60,7 @@ run_collect_info() {
 
 run_update_packages() {
     if should_skip_step "update_packages"; then
-        log_info "Skipping: Package cache update (already completed)"
+        log_info "$(t 'skip.already_completed' "$(t 'step.update_packages')")"
         return 0
     fi
     
@@ -69,7 +70,7 @@ run_update_packages() {
 
 run_install_core() {
     if should_skip_step "install_core"; then
-        log_info "Skipping: Core packages installation (already completed)"
+        log_info "$(t 'skip.already_completed' "$(t 'step.install_core')")"
         return 0
     fi
     
@@ -79,7 +80,7 @@ run_install_core() {
 
 run_install_optional() {
     if should_skip_step "install_optional"; then
-        log_info "Skipping: Optional packages installation (already completed)"
+        log_info "$(t 'skip.already_completed' "$(t 'step.install_optional')")"
         return 0
     fi
     
@@ -89,7 +90,7 @@ run_install_optional() {
 
 run_setup_database() {
     if should_skip_step "setup_database"; then
-        log_info "Skipping: Database setup (already completed)"
+        log_info "$(t 'skip.already_completed' "$(t 'step.setup_database')")"
         return 0
     fi
     
@@ -99,7 +100,7 @@ run_setup_database() {
 
 run_configure_postfix() {
     if should_skip_step "configure_postfix"; then
-        log_info "Skipping: Postfix configuration (already completed)"
+        log_info "$(t 'skip.already_completed' "$(t 'step.configure_postfix')")"
         return 0
     fi
     
@@ -109,7 +110,7 @@ run_configure_postfix() {
 
 run_configure_dovecot() {
     if should_skip_step "configure_dovecot"; then
-        log_info "Skipping: Dovecot configuration (already completed)"
+        log_info "$(t 'skip.already_completed' "$(t 'step.configure_dovecot')")"
         return 0
     fi
     
@@ -119,7 +120,7 @@ run_configure_dovecot() {
 
 run_setup_ssl() {
     if should_skip_step "setup_ssl"; then
-        log_info "Skipping: SSL certificate setup (already completed)"
+        log_info "$(t 'skip.already_completed' "$(t 'step.setup_ssl')")"
         return 0
     fi
     
@@ -129,7 +130,7 @@ run_setup_ssl() {
 
 run_setup_autodiscover() {
     if should_skip_step "setup_autodiscover"; then
-        log_info "Skipping: Autodiscover setup (already completed)"
+        log_info "$(t 'skip.already_completed' "$(t 'step.setup_autodiscover')")"
         return 0
     fi
     
@@ -139,7 +140,7 @@ run_setup_autodiscover() {
 
 run_install_webmail() {
     if should_skip_step "install_webmail"; then
-        log_info "Skipping: Webmail installation (already completed)"
+        log_info "$(t 'skip.already_completed' "$(t 'step.install_webmail')")"
         return 0
     fi
     
@@ -149,7 +150,7 @@ run_install_webmail() {
 
 run_finalize() {
     if should_skip_step "finalize"; then
-        log_info "Skipping: Finalization (already completed)"
+        log_info "$(t 'skip.already_completed' "$(t 'step.finalize')")"
         return 0
     fi
     
@@ -158,7 +159,7 @@ run_finalize() {
     save_progress "finalize" "completed"
     
     # Clear progress on successful completion
-    log_success "Installation completed successfully!"
+    log_success "$(t 'install.completed')"
     clear_progress
 }
 
@@ -171,20 +172,20 @@ main() {
     
     # Check for previous progress and optionally resume
     echo ""
-    log_info "Checking for previous installation progress..."
+    log_info "$(t 'progress.checking')"
     
     local resume_from
     resume_from=$(prompt_resume)
     local resume_status=$?
     
     if [[ $resume_status -ne 0 ]]; then
-        log_warning "Installation cancelled by user"
+        log_warning "$(t 'progress.cancelled')"
         exit 0
     fi
     
     if [[ -z "$resume_from" ]]; then
         echo ""
-        log_info "Starting fresh installation"
+        log_info "$(t 'progress.starting_fresh')"
     fi
     
     # Run all installation steps
@@ -200,13 +201,13 @@ main() {
     
     # Confirm before installation
     print_section "Ready to Install"
-    log_warning "The installation will now begin"
-    log_info "This may take several minutes depending on your internet speed"
-    log_info "You can safely interrupt (Ctrl+C) and resume later"
+    log_warning "$(t 'install.warning')"
+    log_info "$(t 'install.duration')"
+    log_info "$(t 'install.interruptible')"
     echo ""
     
-    if ! ask_yes_no "Do you want to proceed with the installation?" "y"; then
-        log_warning "Installation cancelled by user"
+    if ! ask_yes_no "$(t 'install.continue')" "y"; then
+        log_warning "$(t 'progress.cancelled')"
         exit 0
     fi
     
