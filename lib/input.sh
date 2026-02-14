@@ -34,18 +34,19 @@ collect_basic_info() {
     HOSTNAME="${hostname_input:-mail.$PRIMARY_DOMAIN}"
     
     # Admin email
-    echo -e "${YELLOW}Enter admin email address [admin@$PRIMARY_DOMAIN]:${NC}"
-    read -p "Enter admin email address [admin@$PRIMARY_DOMAIN]: "MAIL="${email_input:-admin@$PRIMARY_DOMAIN}"
+    read -p "Enter admin email address [admin@$PRIMARY_DOMAIN]: " email_input || true
+    ADMIN_EMAIL="${email_input:-admin@$PRIMARY_DOMAIN}"
     
     # Additional domains
     echo ""
-    echo -e "${YELLOW}Do you want to add additional domains? [y/N]:${NC}"
-    read -r add_domains || true
-    read -p "Do you want to add additional domains? [y/N]: "le true; do
-            echo -e "${YELLOW}Enter additional domain (or press Enter to finish):${NC}"
-            read -r domain || true
+    read -p "Do you want to add additional domains? [y/N]: " add_domains || true
+    
+    if [[ "$add_domains" =~ ^[Yy]$ ]]; then
+        while true; do
+            read -p "Enter additional domain (or press Enter to finish): " domain || true
             # Trim whitespace
-            read -p "Enter additional domain (or press Enter to finish): "z "$domain" ]]; then
+            domain=$(echo "$domain" | xargs)
+            if [[ -z "$domain" ]]; then
                 break
             elif [[ "$domain" =~ ^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$ ]]; then
                 DOMAINS+=("$domain")
@@ -89,36 +90,35 @@ collect_component_choices() {
     ENABLE_POLICYD_SPF=true
     
     # SpamAssassin
-    echo -e "${YELLOW}Install SpamAssassin? (spam filtering) [Y/n]:${NC}"
-    read -r spamassassin_choice || true
+    read -p "Install SpamAssassin? (spam filtering) [Y/n]: " spamassassin_choice || true
     spamassassin_choice="${spamassassin_choice:-y}"
     if [[ "$spamassassin_choice" =~ ^[Yy]$ ]]; then
-    read -p "Install SpamAssassin? (spam filtering) [Y/n]: "
+        ENABLE_SPAMASSASSIN=true
+    fi
     
     # ClamAV
-    echo -e "${YELLOW}Install ClamAV? (antivirus scanning) [y/N]:${NC}"
-    read -r clamav_choice || true
+    read -p "Install ClamAV? (antivirus scanning) [y/N]: " clamav_choice || true
     clamav_choice="${clamav_choice:-n}"
     if [[ "$clamav_choice" =~ ^[Yy]$ ]]; then
-    read -p "Install ClamAV? (antivirus scanning) [y/N]: "
+        ENABLE_CLAMAV=true
+    fi
     
     # Rspamd (alternative to SpamAssassin)
     if ! $ENABLE_SPAMASSASSIN; then
-        echo -e "${YELLOW}Install Rspamd? (modern spam filtering alternative) [y/N]:${NC}"
-        read -r rspamd_choice || true
+        read -p "Install Rspamd? (modern spam filtering alternative) [y/N]: " rspamd_choice || true
         rspamd_choice="${rspamd_choice:-n}"
         if [[ "$rspamd_choice" =~ ^[Yy]$ ]]; then
-        read -p "Install Rspamd? (modern spam filtering alternative) [y/N]: "
+            ENABLE_RSPAMD=true
+        fi
     fi
     
     # OpenDKIM
     echo ""
-    echo -e "${YELLOW}Install OpenDKIM? (email authentication) [Y/n]:${NC}"
-    read -r dkim_choice || true
+    read -p "Install OpenDKIM? (email authentication) [Y/n]: " dkim_choice || true
     dkim_choice="${dkim_choice:-y}"
     if [[ "$dkim_choice" =~ ^[Yy]$ ]]; then
         ENABLE_DKIM=true
-    read -p "Install OpenDKIM? (email authentication) [Y/n]: "
+    fi
     echo ""
     echo -e "${YELLOW}Web-based Management Tools:${NC}"
     
@@ -177,12 +177,12 @@ collect_component_choices() {
     
     local webmail_selection
     while true; do
-        echo -e "${YELLOW}Select webmail client [1-$option_num] [1]:${NC}"
-        read -r webmail_selection || true
+        read -p "Select webmail client [1-$option_num] [1]: " webmail_selection || true
         webmail_selection="${webmail_selection:-1}"
         if [[ "$webmail_selection" =~ ^[0-9]+$ ]] && [[ "$webmail_selection" -ge 1 && "$webmail_selection" -le "$option_num" ]]; then
             WEBMAIL_CHOICE="${available_options[$((webmail_selection-1))]}"
-        read -p "Select webmail client [1-$option_num] [1]: " log_info "Skipping webmail installation"
+            if [[ "$WEBMAIL_CHOICE" == "none" ]]; then
+                log_info "Skipping webmail installation"
             else
                 log_success "Selected: ${WEBMAIL_CHOICE^}"
                 # Detect or choose web server if webmail is being installed
