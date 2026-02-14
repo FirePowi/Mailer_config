@@ -5,8 +5,8 @@
 #
 
 # Source UI library for colors and formatting
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/ui.sh"
+_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_LIB_DIR/ui.sh"
 
 # Progress tracking file
 PROGRESS_FILE="${PROGRESS_FILE:-/var/tmp/mail-server-install-progress.state}"
