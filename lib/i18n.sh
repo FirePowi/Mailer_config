@@ -123,10 +123,15 @@ t() {
         string="${I18N_STRINGS[$full_key]:-$key}"
     fi
     
-    # Handle printf-style formatting if arguments provided
+    # Handle formatting if arguments provided
     if [[ $# -gt 0 ]]; then
-        # shellcheck disable=SC2059
-        printf "$string" "$@"
+        # Use bash parameter expansion for simple string replacement
+        local formatted="$string"
+        local arg
+        for arg in "$@"; do
+            formatted="${formatted/\%s/$arg}"
+        done
+        echo "$formatted"
     else
         echo "$string"
     fi
