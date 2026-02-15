@@ -64,14 +64,14 @@ get_next_step() {
     local last_step="$1"
     
     if [[ -z "$last_step" ]]; then
-        printf "%s" "${INSTALL_STEPS[0]}"
+        echo "${INSTALL_STEPS[0]}"
         return
     fi
     
     local found=false
     for step in "${INSTALL_STEPS[@]}"; do
         if [[ "$found" == true ]]; then
-            printf "%s" "$step"
+            echo "$step"
             return
         fi
         if [[ "$step" == "$last_step" ]]; then
@@ -79,7 +79,7 @@ get_next_step() {
         fi
     done
     
-    printf ""  # No more steps
+    echo ""  # No more steps
 }
 
 show_progress_summary() {
@@ -148,7 +148,7 @@ prompt_resume() {
         echo ""
         show_progress_summary
         log_success "$(t 'progress.resuming') $next_step"
-        printf "%s" "$next_step"  # Return the next step to resume from
+        echo "$next_step"  # Return the next step to resume from
         return 0
     else
         if ask_yes_no "$(t 'progress.fresh_question')" "n"; then

@@ -73,7 +73,7 @@ ask_question() {
     fi
     
     read -r response
-    printf "%s" "${response:-$default}"
+    echo "${response:-$default}"
 }
 
 ask_yes_no() {

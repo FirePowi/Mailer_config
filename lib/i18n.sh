@@ -128,7 +128,7 @@ t() {
         # shellcheck disable=SC2059
         printf "$string" "$@"
     else
-        printf "%s" "$string"
+        echo "$string"
     fi
 }
 
