@@ -73,7 +73,10 @@ install_snappymail() {
     
     # Download SnappyMail
     log_step "Downloading SnappyMail..."
-    cd /tmp
+    cd /tmp || {
+        log_error "Cannot change to /tmp directory"
+        return 1
+    }
     wget -q "$ASSET_URL" -O snappymail.zip
     
     # Create installation directory

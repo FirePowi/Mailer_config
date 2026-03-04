@@ -40,7 +40,7 @@ setup_ssl_certificates() {
         fi
         
         # Get certificate for mail hostname
-        log_step "Obtaining certificate for $HOSTNAME..."
+        log_step "Obtaining certificate for $MAIL_HOSTNAME..."
         
         # Stop services that might be using port 80
         systemctl stop postfix dovecot 2>/dev/null || true
@@ -52,24 +52,24 @@ setup_ssl_certificates() {
         
         # Get certificate using standalone method
         certbot certonly --standalone \
-            -d "$HOSTNAME" \
+            -d "$MAIL_HOSTNAME" \
             --non-interactive \
             --agree-tos \
             --email "$ADMIN_EMAIL" \
             --keep-until-expiring
         
         if [ $? -eq 0 ]; then
-            log_success "Certificate obtained for $HOSTNAME"
+            log_success "Certificate obtained for $MAIL_HOSTNAME"
             
             # Update Postfix to use new certificates
-            sed -i "s|smtpd_tls_cert_file.*|smtpd_tls_cert_file = /etc/letsencrypt/live/$HOSTNAME/fullchain.pem|" "$POSTFIX_DIR/main.cf"
-            sed -i "s|smtpd_tls_key_file.*|smtpd_tls_key_file = /etc/letsencrypt/live/$HOSTNAME/privkey.pem|" "$POSTFIX_DIR/main.cf"
+            sed -i "s|smtpd_tls_cert_file.*|smtpd_tls_cert_file = /etc/letsencrypt/live/$MAIL_HOSTNAME/fullchain.pem|" "$POSTFIX_DIR/main.cf"
+            sed -i "s|smtpd_tls_key_file.*|smtpd_tls_key_file = /etc/letsencrypt/live/$MAIL_HOSTNAME/privkey.pem|" "$POSTFIX_DIR/main.cf"
             
             # Update Dovecot to use new certificates
-            sed -i "s|ssl_cert.*|ssl_cert = </etc/letsencrypt/live/$HOSTNAME/fullchain.pem|" "$DOVECOT_DIR/dovecot.conf"
-            sed -i "s|ssl_key.*|ssl_key = </etc/letsencrypt/live/$HOSTNAME/privkey.pem|" "$DOVECOT_DIR/dovecot.conf"
+            sed -i "s|ssl_cert.*|ssl_cert = </etc/letsencrypt/live/$MAIL_HOSTNAME/fullchain.pem|" "$DOVECOT_DIR/dovecot.conf"
+            sed -i "s|ssl_key.*|ssl_key = </etc/letsencrypt/live/$MAIL_HOSTNAME/privkey.pem|" "$DOVECOT_DIR/dovecot.conf"
         else
-            log_error "Failed to obtain certificate for $HOSTNAME"
+            log_error "Failed to obtain certificate for $MAIL_HOSTNAME"
         fi
         
         # Get certificate for webmail domain if webmail is installed
@@ -111,7 +111,7 @@ setup_ssl_certificates() {
     else
         log_warning "Skipping certificate generation"
         log_info "You can generate certificates later with:"
-        echo "  certbot certonly --standalone -d $HOSTNAME -d ${DOMAINS[0]}"
+        echo "  certbot certonly --standalone -d $MAIL_HOSTNAME -d ${MAIL_DOMAINS[0]}"
         if [ "$WEBMAIL_CHOICE" != "none" ]; then
             echo "  certbot certonly --standalone -d mail.${PRIMARY_DOMAIN}"
         fi

@@ -412,7 +412,7 @@ process_title = yes
 DOVECOTCONF
 
     # Replace placeholders
-    sed -i "s/HOSTNAME_PLACEHOLDER/$HOSTNAME/g" "$DOVECOT_DIR/dovecot.conf"
+    sed -i "s/HOSTNAME_PLACEHOLDER/$MAIL_HOSTNAME/g" "$DOVECOT_DIR/dovecot.conf"
     sed -i "s/PRIMARY_DOMAIN_PLACEHOLDER/$PRIMARY_DOMAIN/g" "$DOVECOT_DIR/dovecot.conf"
     
     # Create SQL configuration

@@ -172,7 +172,10 @@ else
     HAS_GIT=false
 fi
 
-cd "$REPO_ROOT"
+cd "$REPO_ROOT" || {
+    echo "Error: Cannot change to repository root directory: $REPO_ROOT"
+    exit 1
+}
 
 SPECS_DIR="$REPO_ROOT/specs"
 mkdir -p "$SPECS_DIR"

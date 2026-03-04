@@ -105,7 +105,7 @@ COMMENT='Audit log for security and compliance';
 EOF
 
     # Insert domains
-    for domain in "${DOMAINS[@]}"; do
+    for domain in "${MAIL_DOMAINS[@]}"; do
         mysql -u root mail <<EOF
 INSERT IGNORE INTO mail_domains (domain, description) 
 VALUES ('$domain', 'Configured by installation script');

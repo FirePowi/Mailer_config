@@ -23,7 +23,7 @@ collect_basic_info() {
         PRIMARY_DOMAIN=$(echo "$PRIMARY_DOMAIN" | xargs)
         # Validate: alphanumeric with dots and hyphens, at least one dot, TLD with 2+ chars
         if [[ "$PRIMARY_DOMAIN" =~ ^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$ ]]; then
-            DOMAINS+=("$PRIMARY_DOMAIN")
+            MAIL_DOMAINS+=("$PRIMARY_DOMAIN")
             break
         else
             log_error "Invalid domain format. Please try again."
@@ -35,7 +35,7 @@ collect_basic_info() {
     echo -ne "${YELLOW}Enter the mail server hostname [mail.$PRIMARY_DOMAIN]:${NC} "
     read -r hostname_input
     hostname_input="${hostname_input:-}"
-    HOSTNAME="${hostname_input:-mail.$PRIMARY_DOMAIN}"
+    MAIL_HOSTNAME="${hostname_input:-mail.$PRIMARY_DOMAIN}"
     
     # Admin email
     echo -ne "${YELLOW}Enter admin email address [admin@$PRIMARY_DOMAIN]:${NC} "
@@ -59,7 +59,7 @@ collect_basic_info() {
             if [[ -z "$domain" ]]; then
                 break
             elif [[ "$domain" =~ ^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$ ]]; then
-                DOMAINS+=("$domain")
+                MAIL_DOMAINS+=("$domain")
                 log_success "Added domain: $domain"
             else
                 log_error "Invalid domain format"
@@ -71,10 +71,10 @@ collect_basic_info() {
     echo ""
     log_info "Configuration summary:"
     log_info "  Primary domain: $PRIMARY_DOMAIN"
-    log_info "  Hostname: $HOSTNAME"
+    log_info "  Hostname: $MAIL_HOSTNAME"
     log_info "  Admin email: $ADMIN_EMAIL"
-    log_info "  Total domains: ${#DOMAINS[@]}"
-    for domain in "${DOMAINS[@]}"; do
+    log_info "  Total domains: ${#MAIL_DOMAINS[@]}"
+    for domain in "${MAIL_DOMAINS[@]}"; do
         log_info "    - $domain"
     done
     

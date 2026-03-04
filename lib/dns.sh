@@ -49,17 +49,17 @@ test_dns_records() {
     
     # Check A record or CNAME for hostname
     local resolved_ip
-    resolved_ip=$(dig +short "$HOSTNAME" A 2>/dev/null | head -1 || true)
+    resolved_ip=$(dig +short "$MAIL_HOSTNAME" A 2>/dev/null | head -1 || true)
     
     # If no A record, check for CNAME and resolve it
     if [[ -z "$resolved_ip" ]]; then
         local cname_target
-        cname_target=$(dig +short "$HOSTNAME" CNAME 2>/dev/null | head -1 || true)
+        cname_target=$(dig +short "$MAIL_HOSTNAME" CNAME 2>/dev/null | head -1 || true)
         
         if [[ -n "$cname_target" ]]; then
             # Remove trailing dot from CNAME if present
             cname_target="${cname_target%.}"
-            log_info "CNAME found: $HOSTNAME -> $cname_target"
+            log_info "CNAME found: $MAIL_HOSTNAME -> $cname_target"
             
             # Resolve the CNAME target to get the final IP
             resolved_ip=$(dig +short "$cname_target" A 2>/dev/null | head -1 || true)
@@ -68,12 +68,12 @@ test_dns_records() {
     
     if [[ -n "$resolved_ip" ]]; then
         if [[ "$resolved_ip" == "$server_ip" ]]; then
-            log_success "DNS for $HOSTNAME resolves correctly to $server_ip"
+            log_success "DNS for $MAIL_HOSTNAME resolves correctly to $server_ip"
         else
-            log_warning "DNS for $HOSTNAME resolves to $resolved_ip (expected: $server_ip)"
+            log_warning "DNS for $MAIL_HOSTNAME resolves to $resolved_ip (expected: $server_ip)"
         fi
     else
-        log_warning "No A record or CNAME found for $HOSTNAME"
+        log_warning "No A record or CNAME found for $MAIL_HOSTNAME"
     fi
     
     # Check MX record
@@ -115,7 +115,7 @@ show_dns_configuration() {
     echo -e "${BOLD}${WHITE}Your Server Information:${NC}"
     echo -e "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo -e "${CYAN}Server IP:${NC}      ${WHITE}$SERVER_IP${NC}"
-    echo -e "${CYAN}Hostname:${NC}       ${WHITE}$HOSTNAME${NC}"
+    echo -e "${CYAN}Hostname:${NC}       ${WHITE}$MAIL_HOSTNAME${NC}"
     echo -e "${CYAN}Primary Domain:${NC} ${WHITE}$PRIMARY_DOMAIN${NC}"
     echo -e ""
     echo -e "${BOLD}${WHITE}Step-by-Step DNS Setup Guide:${NC}"
@@ -128,7 +128,7 @@ show_dns_configuration() {
     echo -e "${YELLOW}Step 2: Add A Record or CNAME (required)${NC}"
     echo -e "   ${BOLD}Option A - A Record:${NC}"
     echo -e "   ${CYAN}Type:${NC}     A"
-    echo -e "   ${CYAN}Name:${NC}     ${WHITE}mail${NC} (or ${WHITE}$HOSTNAME${NC})"
+    echo -e "   ${CYAN}Name:${NC}     ${WHITE}mail${NC} (or ${WHITE}$MAIL_HOSTNAME${NC})"
     echo -e "   ${CYAN}Value:${NC}    ${WHITE}$SERVER_IP${NC}"
     echo -e "   ${CYAN}TTL:${NC}      3600 (or automatic)"
     echo -e ""
@@ -144,7 +144,7 @@ show_dns_configuration() {
     echo -e "${YELLOW}Step 3: Add MX Record (required)${NC}"
     echo -e "   ${CYAN}Type:${NC}     MX"
     echo -e "   ${CYAN}Name:${NC}     ${WHITE}@${NC} (or leave blank for root domain)"
-    echo -e "   ${CYAN}Value:${NC}    ${WHITE}$HOSTNAME${NC} (or ${WHITE}mail.$PRIMARY_DOMAIN${NC})"
+    echo -e "   ${CYAN}Value:${NC}    ${WHITE}$MAIL_HOSTNAME${NC} (or ${WHITE}mail.$PRIMARY_DOMAIN${NC})"
     echo -e "   ${CYAN}Priority:${NC} ${WHITE}10${NC}"
     echo -e "   ${CYAN}TTL:${NC}      3600"
     echo -e ""
@@ -180,10 +180,10 @@ show_dns_configuration() {
     echo -e "${BOLD}${WHITE}Additional Domains Configuration:${NC}"
     echo -e "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-    if [[ ${#DOMAINS[@]} -gt 1 ]]; then
+    if [[ ${#MAIL_DOMAINS[@]} -gt 1 ]]; then
         echo ""
         log_info "For each additional domain, repeat steps 3, 5, and 6 above:"
-        for domain in "${DOMAINS[@]}"; do
+        for domain in "${MAIL_DOMAINS[@]}"; do
             if [[ "$domain" != "$PRIMARY_DOMAIN" ]]; then
                 echo "  • $domain"
             fi
@@ -198,7 +198,7 @@ show_dns_configuration() {
     echo -e "They control the reverse DNS for $SERVER_IP"
     echo -e ""
     echo -e "${CYAN}What to request:${NC}"
-    echo -e "\"Please set the PTR record for $SERVER_IP to point to $HOSTNAME\""
+    echo -e "\"Please set the PTR record for $SERVER_IP to point to $MAIL_HOSTNAME\""
     echo -e ""
     echo -e "${GREEN}What this does:${NC} Prevents your emails from being marked as spam"
     echo -e ""
@@ -208,7 +208,7 @@ show_dns_configuration() {
     echo -e "After adding DNS records, verify them with these commands:"
     echo -e ""
     echo -e "${CYAN}Check A record:${NC}"
-    echo -e "   dig $HOSTNAME A"
+    echo -e "   dig $MAIL_HOSTNAME A"
     echo -e ""
     echo -e "${CYAN}Check MX record:${NC}"
     echo -e "   dig $PRIMARY_DOMAIN MX"
@@ -240,13 +240,13 @@ show_dns_configuration() {
     echo "autodiscover        A       $SERVER_IP"
     echo ""
     echo "# MX Record"
-    echo "@                   MX 10   $HOSTNAME."
+    echo "@                   MX 10   $MAIL_HOSTNAME."
     echo ""
     echo "# TXT Records (SPF and DMARC)"
     echo "@                   TXT     \"v=spf1 mx a ~all\""
     echo "_dmarc              TXT     \"v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL\""
     echo ""
-    echo -e "${CYAN}Note:${NC} The dot after $HOSTNAME is important for the MX record!"
+    echo -e "${CYAN}Note:${NC} The dot after $MAIL_HOSTNAME is important for the MX record!"
     echo ""
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
@@ -338,7 +338,7 @@ show_cloudflare_guide() {
     echo -e "${YELLOW}IMPORTANT:${NC} Turn ${BOLD}OFF${NC} the orange cloud (proxy) for mail records!\n"
     echo -e "${BOLD}Add MX record:${NC}"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "Type: MX   | Name: @             | Server: $HOSTNAME | Priority: 10"
+    echo "Type: MX   | Name: @             | Server: $MAIL_HOSTNAME | Priority: 10"
     echo ""
     echo -e "${BOLD}Add TXT records:${NC}"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -365,7 +365,7 @@ show_godaddy_guide() {
     echo ""
     echo -e "${BOLD}MX Record:${NC}"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "Type: MX   | Name: @             | Value: $HOSTNAME | Priority: 10 | TTL: 1 Hour"
+    echo "Type: MX   | Name: @             | Value: $MAIL_HOSTNAME | Priority: 10 | TTL: 1 Hour"
     echo ""
     echo -e "${BOLD}TXT Records:${NC}"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -392,7 +392,7 @@ show_namecheap_guide() {
     echo ""
     echo -e "${BOLD}MX Record:${NC}"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "Type: MX Record | Host: @             | Value: $HOSTNAME | Priority: 10"
+    echo "Type: MX Record | Host: @             | Value: $MAIL_HOSTNAME | Priority: 10"
     echo ""
     echo -e "${BOLD}TXT Records:${NC}"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -417,7 +417,7 @@ show_google_guide() {
     echo "mail          | A    | 3600 | $SERVER_IP"
     echo "autoconfig    | A    | 3600 | $SERVER_IP"
     echo "autodiscover  | A    | 3600 | $SERVER_IP"
-    echo "@             | MX   | 3600 | 10 $HOSTNAME"
+    echo "@             | MX   | 3600 | 10 $MAIL_HOSTNAME"
     echo "@             | TXT  | 3600 | v=spf1 mx a ~all"
     echo "_dmarc        | TXT  | 3600 | v=DMARC1; p=none; rua=mailto:$ADMIN_EMAIL"
     echo ""
@@ -446,7 +446,7 @@ show_generic_guide() {
     echo -e "${YELLOW}MX Record (1 entry):${NC}"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "Name/Host          | Type | Value/Points To      | Priority"
-    echo "@  (or blank)      | MX   | $HOSTNAME           | 10"
+    echo "@  (or blank)      | MX   | $MAIL_HOSTNAME           | 10"
     echo ""
     echo -e "${YELLOW}TXT Records (2 entries):${NC}"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

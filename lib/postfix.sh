@@ -345,7 +345,7 @@ DKIM_PLACEHOLDER
 MAINCONF
 
     # Replace placeholders
-    sed -i "s/HOSTNAME_PLACEHOLDER/$HOSTNAME/g" "$POSTFIX_DIR/main.cf"
+    sed -i "s/HOSTNAME_PLACEHOLDER/$MAIL_HOSTNAME/g" "$POSTFIX_DIR/main.cf"
     sed -i "s/PRIMARY_DOMAIN_PLACEHOLDER/$PRIMARY_DOMAIN/g" "$POSTFIX_DIR/main.cf"
     
     # Add Policyd-SPF if enabled

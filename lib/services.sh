@@ -78,14 +78,14 @@ ${BOLD}${WHITE}CONFIGURATION SUMMARY${NC}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ${CYAN}Primary Domain:${NC}     $PRIMARY_DOMAIN
-${CYAN}Hostname:${NC}           $HOSTNAME
+${CYAN}Hostname:${NC}           $MAIL_HOSTNAME
 ${CYAN}Admin Email:${NC}        $ADMIN_EMAIL
-${CYAN}Total Domains:${NC}      ${#DOMAINS[@]}
+${CYAN}Total Domains:${NC}      ${#MAIL_DOMAINS[@]}
 
 ${CYAN}Domains configured:${NC}
 EOF
 
-    for domain in "${DOMAINS[@]}"; do
+    for domain in "${MAIL_DOMAINS[@]}"; do
         echo "  • $domain"
     done
     
@@ -118,7 +118,7 @@ ${BOLD}${WHITE}WEB INTERFACES${NC}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ${CYAN}PostfixAdmin:${NC}
-${WHITE}https://$HOSTNAME/postfixadmin${NC}
+${WHITE}https://$MAIL_HOSTNAME/postfixadmin${NC}
 Setup by visiting above URL and using setup password
 
 EOF
@@ -172,7 +172,7 @@ ${BOLD}${WHITE}NEXT STEPS${NC}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ${CYAN}1.${NC} Configure PostfixAdmin:
-   Visit https://$HOSTNAME/postfixadmin
+   Visit https://$MAIL_HOSTNAME/postfixadmin
    Complete the setup wizard with the provided password
 
 ${CYAN}2.${NC} Create email accounts:
@@ -185,12 +185,12 @@ ${CYAN}4.${NC} Configure email client:
    Use the following settings:
    
    ${BOLD}Incoming Mail (IMAP):${NC}
-   Server: $HOSTNAME
+   Server: $MAIL_HOSTNAME
    Port: 993
    Security: SSL/TLS
    
    ${BOLD}Outgoing Mail (SMTP):${NC}
-   Server: $HOSTNAME
+   Server: $MAIL_HOSTNAME
    Port: 587
    Security: STARTTLS
 

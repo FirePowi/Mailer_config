@@ -20,7 +20,7 @@ setup_autodiscover() {
     
     log_info "Configuring Autodiscover (Outlook) and Autoconfig (Thunderbird)..."
     
-    for DOMAIN in "${DOMAINS[@]}"; do
+    for DOMAIN in "${MAIL_DOMAINS[@]}"; do
         log_step "Setting up autoconfiguration for $DOMAIN"
         
         # Create directory structure
